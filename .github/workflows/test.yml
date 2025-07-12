@@ -51,6 +51,8 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
+    - uses: actions/checkout@v4
+    
     - name: Deploy to Vercel
       uses: amondnet/vercel-action@v25
       with:
