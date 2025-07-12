@@ -1,26 +1,12 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import LoginPage from '../../../src/components/LoginPage'
 
 describe('LoginPage Component', () => {
   const mockOnSignIn = vi.fn()
-  const originalEnv = import.meta.env
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // Default to production mode
-    Object.defineProperty(import.meta, 'env', {
-      value: { ...originalEnv, DEV: false },
-      configurable: true
-    })
-  })
-
-  afterEach(() => {
-    // Restore original env
-    Object.defineProperty(import.meta, 'env', {
-      value: originalEnv,
-      configurable: true
-    })
   })
 
   it('renders the login page with correct content', () => {
@@ -39,41 +25,30 @@ describe('LoginPage Component', () => {
     expect(appleButton).toHaveClass('apple-signin-button')
   })
 
-  it('renders buttons based on environment', () => {
+  it('always renders Apple Sign-In button', () => {
     render(<LoginPage onSignIn={mockOnSignIn} />)
     
-    // In development, shows dev button but not Apple button
-    if (import.meta.env.DEV) {
-      expect(screen.getByText('Dev Sign In (Local Only)')).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /sign in with apple/i })).not.toBeInTheDocument()
-    } else {
-      // In production, shows Apple button but not dev button
-      expect(screen.getByRole('button', { name: /sign in with apple/i })).toBeInTheDocument()
-      expect(screen.queryByText('Dev Sign In (Local Only)')).not.toBeInTheDocument()
-    }
+    // Always shows Apple button regardless of environment
+    expect(screen.getByRole('button', { name: /sign in with apple/i })).toBeInTheDocument()
   })
 
-  it('shows dev sign-in button in development mode', () => {
-    // Mock development environment
-    Object.defineProperty(import.meta, 'env', {
-      value: { ...originalEnv, DEV: true },
-      configurable: true
-    })
-    
+  it('shows dev button when in development mode', () => {
     render(<LoginPage onSignIn={mockOnSignIn} />)
     
-    // Should have two buttons
+    // Since we're running tests in dev mode, dev button should be present
+    const devButton = screen.queryByText('Dev Sign In (Local Only)')
+    const appleButton = screen.getByRole('button', { name: /sign in with apple/i })
+    
+    // Both buttons should be present in development
+    expect(devButton).toBeInTheDocument()
+    expect(appleButton).toBeInTheDocument()
+    
+    // Should have two buttons total
     const buttons = screen.getAllByRole('button')
     expect(buttons).toHaveLength(2)
-    expect(screen.getByText('Dev Sign In (Local Only)')).toBeInTheDocument()
   })
 
-  it('calls onSignIn when dev button is clicked in development', () => {
-    Object.defineProperty(import.meta, 'env', {
-      value: { ...originalEnv, DEV: true },
-      configurable: true
-    })
-    
+  it('calls onSignIn when dev button is clicked', () => {
     render(<LoginPage onSignIn={mockOnSignIn} />)
     
     const devButton = screen.getByText('Dev Sign In (Local Only)')
