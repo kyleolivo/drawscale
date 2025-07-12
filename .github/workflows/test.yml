@@ -7,10 +7,35 @@ on:
     branches: [ main ]
 
 jobs:
+  notify-push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+    - name: Notify Discord - New Push
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: |
+          🚀 **New push to `{{ EVENT_PAYLOAD.repository.name }}`**
+          📝 Commit: `{{ EVENT_PAYLOAD.head_commit.message }}`
+          👤 Author: {{ EVENT_PAYLOAD.head_commit.author.name }}
+          🔗 [View commit]({{ EVENT_PAYLOAD.head_commit.url }})
+
   test:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Notify Discord - Tests Starting
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: |
+          🧪 **Tests starting** for `{{ GITHUB_REPOSITORY }}`
+          📋 Run: [#{{ GITHUB_RUN_NUMBER }}]({{ GITHUB_SERVER_URL }}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }})
+    
     - uses: actions/checkout@v4
     
     - name: Setup Node.js
@@ -44,6 +69,16 @@ jobs:
           playwright-report/
           coverage/
         retention-days: 7
+    
+    - name: Notify Discord - Tests Completed
+      uses: Ilshidur/action-discord@master
+      if: always()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: |
+          ${{ job.status == 'success' && '✅ **Tests passed**' || '❌ **Tests failed**' }} for `{{ GITHUB_REPOSITORY }}`
+          📋 Run: [#{{ GITHUB_RUN_NUMBER }}]({{ GITHUB_SERVER_URL }}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }})
 
   deploy:
     needs: test
@@ -51,6 +86,15 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
+    - name: Notify Discord - Deploy Starting
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: |
+          🚀 **Deployment starting** for `{{ GITHUB_REPOSITORY }}`
+          📋 Run: [#{{ GITHUB_RUN_NUMBER }}]({{ GITHUB_SERVER_URL }}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }})
+    
     - uses: actions/checkout@v4
     
     - name: Deploy to Vercel
@@ -60,3 +104,14 @@ jobs:
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
         vercel-args: '--prod'
+    
+    - name: Notify Discord - Deploy Completed
+      uses: Ilshidur/action-discord@master
+      if: always()
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: |
+          ${{ job.status == 'success' && '🎉 **Deployment successful**' || '💥 **Deployment failed**' }} for `{{ GITHUB_REPOSITORY }}`
+          🌐 Live at: https://www.drawscale.app
+          📋 Run: [#{{ GITHUB_RUN_NUMBER }}]({{ GITHUB_SERVER_URL }}/{{ GITHUB_REPOSITORY }}/actions/runs/{{ GITHUB_RUN_ID }})
