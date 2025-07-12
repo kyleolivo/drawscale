@@ -74,8 +74,6 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
     }
   };
 
-  const isDevelopment = import.meta.env.DEV;
-
   const handleDevSignIn = () => {
     // Mock user for development
     onSignIn({
