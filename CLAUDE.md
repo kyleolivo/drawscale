@@ -69,28 +69,64 @@ drawscale/
 
 ## Architecture
 
-- **Main Component**: `App.jsx` integrates Excalidraw and provides the main UI
+- **Main Component**: `App.tsx` provides authentication flow and routing
+- **Authentication**: Apple Sign-In protects access to the drawing canvas
+- **Drawing Component**: `DrawCanvas.tsx` integrates Excalidraw for authenticated users
 - **Styling**: CSS modules for component-specific styles
 - **Build System**: Vite for fast development and optimized production builds
 
+## Authentication
+
+The app includes Apple Sign-In authentication to protect access to OpenAI API features. Users must authenticate before accessing the drawing canvas.
+
+### Authentication Flow
+- **Login Page**: Displays Apple Sign-In button when user is not authenticated
+- **Protected Route**: Main app (Excalidraw canvas) only accessible after authentication
+- **Logout**: Users can sign out from the header bar
+- **Persistence**: Authentication state persists using localStorage
+
+### Components
+- `LoginPage.tsx` - Apple Sign-In interface
+- `DrawCanvas.tsx` - Protected main application component
+- `AuthContext.tsx` - Authentication state management
+- `useAuth.ts` - Authentication hook
+
+**Note**: You'll need to configure your Apple Developer account and update the `clientId` in `LoginPage.tsx` with your actual App Bundle ID for production use.
+
 ## Testing Strategy
 
-The project includes comprehensive testing at multiple levels:
+The project follows a **separate test directory structure** (similar to Java conventions) for clean organization.
+
+### Test Organization
+```
+tests/
+├── setup.js             # Test configuration and mocks
+├── unit/                # Unit tests (isolated component testing)
+│   ├── components/      # Component tests
+│   ├── hooks/           # Hook tests
+│   └── App.test.tsx     # Main app unit tests
+├── integration/         # Integration tests (component interaction)
+│   └── App.integration.test.tsx
+└── e2e/                # End-to-end tests (full user workflows)
+    └── drawscale.spec.js
+```
+
+**Important**: Always place tests in the `tests/` directory, never co-located with source files.
 
 ### Unit Tests
-- **Location**: `src/App.test.jsx`
+- **Location**: `tests/unit/`
 - **Framework**: Vitest + React Testing Library
-- **Purpose**: Test component rendering, structure, and basic functionality
-- **Mocking**: Excalidraw is mocked to test App component in isolation
+- **Purpose**: Test individual components, hooks, and functions in isolation
+- **Mocking**: External dependencies are mocked (e.g., Excalidraw, Apple Sign-In)
 
 ### Integration Tests
-- **Location**: `src/App.integration.test.jsx`
+- **Location**: `tests/integration/`
 - **Framework**: Vitest + React Testing Library
-- **Purpose**: Test actual Excalidraw integration and canvas rendering
-- **Approach**: Tests real component integration without mocking
+- **Purpose**: Test component interactions and authentication flows
+- **Approach**: Tests real component integration with minimal mocking
 
 ### End-to-End Tests
-- **Location**: `e2e/drawscale.spec.js`
+- **Location**: `tests/e2e/`
 - **Framework**: Playwright
 - **Purpose**: Test complete user workflows and application behavior
 - **Coverage**: Cross-browser testing (Chrome, Firefox, Safari)
@@ -98,7 +134,7 @@ The project includes comprehensive testing at multiple levels:
 ### Test Configuration
 - **Vitest Config**: `vitest.config.js` - Unit/Integration test setup
 - **Playwright Config**: `playwright.config.js` - E2E test setup  
-- **Test Setup**: `src/test/setup.js` - Mocks for canvas and browser APIs
+- **Test Setup**: `tests/setup.js` - Mocks for canvas and browser APIs
 
 ## Git Configuration
 

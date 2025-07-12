@@ -4,28 +4,16 @@
   flex-direction: column;
 }
 
-.App-header {
-  background-color: #282c34;
-  padding: 1rem;
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.loading-spinner {
   color: white;
-  text-align: center;
-}
-
-.App-header h1 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.App-header p {
-  margin: 0.5rem 0 0 0;
-  font-size: 1rem;
-  opacity: 0.8;
-}
-
-.excalidraw-wrapper {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  height: 100%;
+  font-size: 1.2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
