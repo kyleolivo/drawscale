@@ -1,13 +1,6 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "redirects": [
-    {
-      "source": "https://drawscale.app/:path*",
-      "destination": "https://www.drawscale.app/:path*",
-      "permanent": true
-    }
-  ],
   "github": {
     "autoJobCancelation": true
   },

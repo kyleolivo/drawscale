@@ -97,7 +97,7 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
         </div>
         
         <div className="login-content">
-          {isDevelopment && (
+          
             <button 
               className="apple-signin-button"
               onClick={handleDevSignIn}
@@ -115,7 +115,7 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
               </svg>
               Dev Sign In (Local Only)
             </button>
-          )}
+          
           
           <button 
             className="apple-signin-button"
