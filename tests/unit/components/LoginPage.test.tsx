@@ -39,11 +39,18 @@ describe('LoginPage Component', () => {
     expect(appleButton).toHaveClass('apple-signin-button')
   })
 
-  it('renders Apple Sign-In button always', () => {
+  it('renders buttons based on environment', () => {
     render(<LoginPage onSignIn={mockOnSignIn} />)
     
-    // Always renders Apple Sign-In button regardless of environment
-    expect(screen.getByRole('button', { name: /sign in with apple/i })).toBeInTheDocument()
+    // In development, shows dev button but not Apple button
+    if (import.meta.env.DEV) {
+      expect(screen.getByText('Dev Sign In (Local Only)')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /sign in with apple/i })).not.toBeInTheDocument()
+    } else {
+      // In production, shows Apple button but not dev button
+      expect(screen.getByRole('button', { name: /sign in with apple/i })).toBeInTheDocument()
+      expect(screen.queryByText('Dev Sign In (Local Only)')).not.toBeInTheDocument()
+    }
   })
 
   it('shows dev sign-in button in development mode', () => {
