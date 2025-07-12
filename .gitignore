@@ -47,6 +47,10 @@ web_modules/
 # TypeScript cache
 *.tsbuildinfo
 
+# TypeScript build outputs
+*.d.ts
+*.d.ts.map
+
 # Optional npm cache directory
 .npm
 
@@ -137,3 +141,43 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Test results and reports
+test-results/
+playwright-report/
+coverage/
+.vitest/
+
+# Development logs
+dev-server.log
+
+# Playwright specific
+blob-report/
+.trace
+allure*
+.local-browsers/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+*.code-workspace
+*.vsix
+.idea/
+*.swp
+*.swo
+
+# TypeScript specific
+typings/
