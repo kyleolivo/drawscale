@@ -3,15 +3,9 @@
   "outputDirectory": "dist",
   "redirects": [
     {
-      "source": "/(.*)",
-      "destination": "https://www.drawscale.app/$1",
-      "permanent": true,
-      "has": [
-        {
-          "type": "host",
-          "value": "drawscale.app"
-        }
-      ]
+      "source": "https://drawscale.app/:path*",
+      "destination": "https://www.drawscale.app/:path*",
+      "permanent": true
     }
   ],
   "github": {
