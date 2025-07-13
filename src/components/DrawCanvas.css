@@ -50,7 +50,60 @@
   background: #c82333;
 }
 
-.excalidraw-wrapper {
+.canvas-container {
+  display: flex;
+  flex-direction: row;
   height: calc(100vh - 80px);
   width: 100%;
+  position: relative;
+  --drawer-width: 350px;
+}
+
+.canvas-container.drawer-closed {
+  --drawer-width: 20px;
+}
+
+.excalidraw-wrapper {
+  flex: 1 1 0%;
+  width: auto;
+  height: 100%;
+  min-width: 0;
+  /* ensures flex child shrinks properly */
+}
+
+/* Remove margin-left logic */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .canvas-container {
+    flex-direction: column;
+    height: calc(100vh - 80px);
+  }
+  .canvas-container.drawer-closed {
+    --drawer-width: 20px;
+  }
+  .excalidraw-wrapper {
+    min-width: 0;
+    flex: 1;
+    height: 100%;
+    display: block;
+  }
+  .problem-drawer {
+    width: 100% !important;
+    height: auto;
+    min-height: unset;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: none;
+    position: static;
+    max-width: 100vw;
+  }
+  .drawer-header, .drawer-content {
+    padding: 16px;
+  }
+  .drawer-content {
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+  }
 }

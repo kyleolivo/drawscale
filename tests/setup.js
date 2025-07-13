@@ -1,5 +1,20 @@
 import '@testing-library/jest-dom'
 
+// Mock window.matchMedia which is used by DrawCanvas but not available in jsdom
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
 // Mock Path2D which is used by Excalidraw but not available in jsdom
 global.Path2D = class Path2D {
   constructor(path) {

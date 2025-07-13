@@ -1,6 +1,16 @@
 import { useEffect } from 'react';
 import './LoginPage.css';
 
+// Add type declaration for import.meta.env
+declare global {
+  interface ImportMeta {
+    readonly env: {
+      readonly VITE_APPLE_CLIENT_ID?: string;
+      readonly VITE_APPLE_REDIRECT_URI?: string;
+    };
+  }
+}
+
 interface AppleSignInConfig {
   clientId: string;
   scope: string;

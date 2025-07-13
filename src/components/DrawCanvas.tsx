@@ -1,9 +1,29 @@
+import { useState, useEffect } from 'react';
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { useAuth } from '../hooks/useAuth';
+import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
+import { DEFAULT_PROBLEM } from '../constants/problems';
 import './DrawCanvas.css';
 
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.matchMedia('(max-width: 768px)').matches;
+      setIsMobile(mobile);
+      if (mobile) setIsDrawerOpen(true);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const handleDrawerToggle = () => {
+    if (!isMobile) setIsDrawerOpen(!isDrawerOpen);
+  };
 
   return (
     <div className="App">
@@ -21,8 +41,19 @@ function DrawCanvas(): JSX.Element {
           </div>
         </div>
       </header>
-      <div className="excalidraw-wrapper">
-        <Excalidraw />
+      <div className={`canvas-container ${isDrawerOpen ? 'drawer-open' : 'drawer-closed'}`}>
+        <ProblemDrawer
+          problem={DEFAULT_PROBLEM}
+          isOpen={isDrawerOpen}
+        />
+        <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
+          <Excalidraw />
+        </div>
+        <DrawerToggle
+          isOpen={isDrawerOpen}
+          onToggle={handleDrawerToggle}
+          isMobile={isMobile}
+        />
       </div>
     </div>
   );
