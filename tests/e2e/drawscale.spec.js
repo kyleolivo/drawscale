@@ -18,7 +18,8 @@ test.describe('DrawScale Application', () => {
     // Should see login page
     await expect(page.getByRole('heading', { name: 'DrawScale' })).toBeVisible();
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in with apple/i })).toBeVisible();
+    // In development mode, should see dev button
+    await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
     
     // Should not see Excalidraw
     await expect(page.locator('.excalidraw-wrapper')).not.toBeVisible();
@@ -47,7 +48,8 @@ test.describe('DrawScale Application', () => {
     
     // Should be back at login page
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in with apple/i })).toBeVisible();
+    // In development mode, should see dev button
+    await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
   });
 
   test('displays the application header correctly when authenticated', async ({ page }) => {
@@ -107,12 +109,15 @@ test.describe('DrawScale Application', () => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await page.goto('/');
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
+    await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
     
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
+    await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
     
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
+    await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
     
     // Test authenticated app on different sizes
     await mockAuthentication(page);
