@@ -51,24 +51,28 @@
 }
 
 .canvas-container {
-  position: relative;
+  display: flex;
+  flex-direction: row;
   height: calc(100vh - 80px);
   width: 100%;
 }
 
 .excalidraw-wrapper {
+  flex: 1 1 0%;
+  width: auto;
   height: 100%;
-  width: 100%;
-  transition: margin-left 0.1s ease-in-out;
+  min-width: 0;
+  /* ensures flex child shrinks properly */
 }
 
-.excalidraw-wrapper.with-drawer {
-  margin-left: 350px;
-}
+/* Remove margin-left logic */
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .excalidraw-wrapper.with-drawer {
-    margin-left: 300px;
+  .canvas-container {
+    flex-direction: column;
+  }
+  .excalidraw-wrapper {
+    min-width: 0;
   }
 }

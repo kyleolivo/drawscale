@@ -1,14 +1,12 @@
 .problem-drawer {
-  position: fixed;
-  left: 0;
-  top: 0;
+  /* Remove position: fixed, left, top, z-index, box-shadow */
   height: 100vh;
   background: white;
   border-right: 1px solid #e5e7eb;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   transition: width 0.1s ease-in-out;
-  z-index: 1000;
   overflow: hidden;
+  flex-shrink: 0;
+  /* width is set by open/closed classes */
 }
 
 .problem-drawer.open {
@@ -164,5 +162,8 @@
 @media (max-width: 768px) {
   .problem-drawer.open {
     width: 300px;
+  }
+  .problem-drawer.closed {
+    width: 48px;
   }
 } 
