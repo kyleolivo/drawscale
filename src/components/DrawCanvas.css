@@ -50,7 +50,25 @@
   background: #c82333;
 }
 
-.excalidraw-wrapper {
+.canvas-container {
+  position: relative;
   height: calc(100vh - 80px);
   width: 100%;
+}
+
+.excalidraw-wrapper {
+  height: 100%;
+  width: 100%;
+  transition: margin-left 0.1s ease-in-out;
+}
+
+.excalidraw-wrapper.with-drawer {
+  margin-left: 350px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .excalidraw-wrapper.with-drawer {
+    margin-left: 300px;
+  }
 }
