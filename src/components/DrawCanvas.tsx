@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { useAuth } from '../hooks/useAuth';
 import ProblemDrawer from './ProblemDrawer';
@@ -8,9 +8,21 @@ import './DrawCanvas.css';
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.matchMedia('(max-width: 768px)').matches;
+      setIsMobile(mobile);
+      if (mobile) setIsDrawerOpen(true);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleDrawerToggle = () => {
-    setIsDrawerOpen(!isDrawerOpen);
+    if (!isMobile) setIsDrawerOpen(!isDrawerOpen);
   };
 
   return (
@@ -38,9 +50,10 @@ function DrawCanvas(): JSX.Element {
           <Excalidraw />
         </div>
         <button 
-          className="drawer-toggle"
+          className={`drawer-toggle${isMobile ? ' hide-mobile' : ''}`}
           onClick={handleDrawerToggle}
           aria-label={isDrawerOpen ? 'Hide instructions' : 'Show instructions'}
+          disabled={isMobile}
         >
           <svg 
             className={`toggle-arrow ${isDrawerOpen ? 'open' : ''}`}

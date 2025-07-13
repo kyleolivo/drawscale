@@ -120,14 +120,19 @@ test.describe('DrawScale Application', () => {
     await page.setViewportSize({ width: 1200, height: 800 });
     await page.reload();
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
+    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
     
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
+    // Wait for Excalidraw to adjust to new viewport size
+    await page.waitForTimeout(2000);
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
     
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
+    // Wait for Excalidraw to adjust to new viewport size
+    await page.waitForTimeout(2000);
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
   });
 
