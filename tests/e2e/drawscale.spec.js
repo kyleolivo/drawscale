@@ -95,7 +95,7 @@ test.describe('DrawScale Application', () => {
     await page.goto('/');
     
     // Wait for Excalidraw to fully load
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(150);
     
     // Check for canvas elements that Excalidraw creates
     const canvasElements = page.locator('canvas');
@@ -126,13 +126,13 @@ test.describe('DrawScale Application', () => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
     // Wait for Excalidraw to adjust to new viewport size
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(150);
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
     
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
     // Wait for Excalidraw to adjust to new viewport size
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(150);
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
   });
 
@@ -154,7 +154,7 @@ test.describe('DrawScale Application', () => {
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
     
     // Wait for layout to adjust
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(150);
     
     // Check that drawer content is visible on mobile - use specific selectors
     await expect(page.locator('.problem-drawer .problem-title')).toBeVisible();
@@ -200,7 +200,7 @@ test.describe('DrawScale Application', () => {
     });
     
     await page.goto('/');
-    await page.waitForTimeout(3000); // Wait for full load
+    await page.waitForTimeout(150); // Wait for full load
     
     // Filter out known Excalidraw warnings that aren't actual errors
     const actualErrors = consoleErrors.filter(error => 
