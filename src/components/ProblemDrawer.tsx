@@ -37,30 +37,6 @@ const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
             {getDifficultyText(problem.difficulty)}
           </div>
         </div>
-        <button 
-          className="drawer-toggle"
-          onClick={onToggle}
-          aria-label={isOpen ? 'Hide instructions' : 'Show instructions'}
-        >
-          <svg 
-            className={`toggle-arrow ${isOpen ? 'open' : ''}`}
-            width="16" 
-            height="16" 
-            viewBox="0 0 16 16" 
-            fill="none"
-          >
-            <path 
-              d="M10 12L6 8L10 4" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="toggle-text">
-            {isOpen ? 'Hide' : 'Show'} Instructions
-          </span>
-        </button>
       </div>
       
       <div className="drawer-content">
@@ -69,6 +45,28 @@ const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
           <ReactMarkdown>{problem.content}</ReactMarkdown>
         </div>
       </div>
+
+      <button 
+        className="drawer-toggle"
+        onClick={onToggle}
+        aria-label={isOpen ? 'Hide instructions' : 'Show instructions'}
+      >
+        <svg 
+          className={`toggle-arrow ${isOpen ? 'open' : ''}`}
+          width="16" 
+          height="16" 
+          viewBox="0 0 16 16" 
+          fill="none"
+        >
+          <path 
+            d="M6 12L10 8L6 4" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
     </div>
   );
 };
