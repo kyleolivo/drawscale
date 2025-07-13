@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { useAuth } from '../hooks/useAuth';
-import ProblemDrawer from './ProblemDrawer';
+import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
 import { DEFAULT_PROBLEM } from '../constants/problems';
 import './DrawCanvas.css';
 
@@ -49,28 +49,11 @@ function DrawCanvas(): JSX.Element {
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
           <Excalidraw />
         </div>
-        <button 
-          className={`drawer-toggle${isMobile ? ' hide-mobile' : ''}`}
-          onClick={handleDrawerToggle}
-          aria-label={isDrawerOpen ? 'Hide instructions' : 'Show instructions'}
-          disabled={isMobile}
-        >
-          <svg 
-            className={`toggle-arrow ${isDrawerOpen ? 'open' : ''}`}
-            width="16" 
-            height="16" 
-            viewBox="0 0 16 16" 
-            fill="none"
-          >
-            <path 
-              d="M6 12L10 8L6 4" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
+        <DrawerToggle
+          isOpen={isDrawerOpen}
+          onToggle={handleDrawerToggle}
+          isMobile={isMobile}
+        />
       </div>
     </div>
   );

@@ -3,6 +3,49 @@ import ReactMarkdown from 'react-markdown';
 import { ProblemDrawerProps, DifficultyLevel } from '../types/problem';
 import './ProblemDrawer.css';
 
+interface DrawerToggleProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  isMobile?: boolean;
+}
+
+export const DrawerToggle: React.FC<DrawerToggleProps> = ({ 
+  isOpen, 
+  onToggle, 
+  isMobile = false 
+}) => {
+  const handleToggle = () => {
+    if (!isMobile) {
+      onToggle();
+    }
+  };
+
+  return (
+    <button 
+      className={`drawer-toggle${isMobile ? ' hide-mobile' : ''}`}
+      onClick={handleToggle}
+      aria-label={isOpen ? 'Hide instructions' : 'Show instructions'}
+      disabled={isMobile}
+    >
+      <svg 
+        className={`toggle-arrow ${isOpen ? 'open' : ''}`}
+        width="16" 
+        height="16" 
+        viewBox="0 0 16 16" 
+        fill="none"
+      >
+        <path 
+          d="M6 12L10 8L6 4" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
+  );
+};
+
 const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
   problem,
   isOpen = true
