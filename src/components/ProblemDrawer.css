@@ -33,7 +33,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .problem-title {
@@ -54,9 +54,17 @@
   white-space: nowrap;
 }
 
+.problem-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .problem-drawer.closed .toggle-text,
 .problem-drawer.closed .header-content,
-.problem-drawer.closed .drawer-content {
+.problem-drawer.closed .drawer-content,
+.problem-drawer.closed .problem-description {
   display: none;
 }
 
@@ -64,13 +72,6 @@
   padding: 20px;
   height: calc(100vh - 120px);
   overflow-y: auto;
-}
-
-.problem-description {
-  margin: 0 0 20px 0;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.5;
 }
 
 .problem-content {

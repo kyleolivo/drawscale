@@ -36,10 +36,10 @@ const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
             {getDifficultyText(problem.difficulty)}
           </div>
         </div>
+        <p className="problem-description">{problem.description}</p>
       </div>
       
       <div className="drawer-content">
-        <p className="problem-description">{problem.description}</p>
         <div className="problem-content">
           <ReactMarkdown>{problem.content}</ReactMarkdown>
         </div>
