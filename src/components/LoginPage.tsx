@@ -55,13 +55,19 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
     script.async = true;
     script.onload = () => {
       if (window.AppleID) {
-        window.AppleID.auth.init({
+        const config = {
           clientId: import.meta.env.VITE_APPLE_CLIENT_ID || 'your.app.bundle.id',
           scope: 'name email',
-          redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI || window.location.origin + '/auth/callback',
+          redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI || window.location.origin,
           state: 'auth',
           usePopup: true
-        });
+        };
+        
+        console.log('Initializing Apple Sign-In with config:', config);
+        console.log('Current domain:', window.location.hostname);
+        console.log('Full URL:', window.location.href);
+        
+        window.AppleID.auth.init(config);
       }
     };
     document.head.appendChild(script);
@@ -74,13 +80,33 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
   const handleAppleSignIn = async () => {
     try {
       if (window.AppleID) {
-        console.log('Starting Apple Sign-In...');
+        console.log('Starting Apple Sign-In...', {
+          clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
+          redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI,
+          currentOrigin: window.location.origin,
+          currentHref: window.location.href
+        });
+        
         const response = await window.AppleID.auth.signIn();
         console.log('Apple Sign-In response:', response);
         onSignIn(response);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Apple Sign-In error:', error);
+      console.error('Error details:', {
+        code: error.error,
+        message: error.toString(),
+        stack: error.stack
+      });
+      
+      // Common Apple Sign-In error codes
+      if (error.error === 'popup_closed_by_user') {
+        console.log('User closed the popup');
+      } else if (error.error === 'user_cancelled_authorize') {
+        console.log('User cancelled authorization');
+      } else if (error.error === 'invalid_request') {
+        console.error('Invalid request - check your Apple configuration');
+      }
     }
   };
 
