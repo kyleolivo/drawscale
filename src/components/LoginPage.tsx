@@ -91,21 +91,29 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
         console.log('Apple Sign-In response:', response);
         onSignIn(response);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Apple Sign-In error:', error);
-      console.error('Error details:', {
-        code: error.error,
-        message: error.toString(),
-        stack: error.stack
-      });
       
-      // Common Apple Sign-In error codes
-      if (error.error === 'popup_closed_by_user') {
-        console.log('User closed the popup');
-      } else if (error.error === 'user_cancelled_authorize') {
-        console.log('User cancelled authorization');
-      } else if (error.error === 'invalid_request') {
-        console.error('Invalid request - check your Apple configuration');
+      // Type guard for error with error property
+      if (error && typeof error === 'object' && 'error' in error) {
+        const appleError = error as { error: string; toString(): string; stack?: string };
+        
+        console.error('Error details:', {
+          code: appleError.error,
+          message: appleError.toString(),
+          stack: appleError.stack
+        });
+        
+        // Common Apple Sign-In error codes
+        if (appleError.error === 'popup_closed_by_user') {
+          console.log('User closed the popup');
+        } else if (appleError.error === 'user_cancelled_authorize') {
+          console.log('User cancelled authorization');
+        } else if (appleError.error === 'invalid_request') {
+          console.error('Invalid request - check your Apple configuration');
+        }
+      } else {
+        console.error('Unknown error type:', error);
       }
     }
   };
