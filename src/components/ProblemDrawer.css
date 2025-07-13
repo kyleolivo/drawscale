@@ -54,47 +54,6 @@
   white-space: nowrap;
 }
 
-.drawer-toggle {
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  color: #6b7280;
-  font-size: 14px;
-  transition: all 0.1s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.drawer-toggle:hover {
-  background: #f9fafb;
-  color: #374151;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.toggle-arrow {
-  transition: transform 0.1s ease;
-  width: 16px;
-  height: 16px;
-}
-
-.toggle-arrow.open {
-  transform: rotate(180deg);
-}
-
-.toggle-text {
-  display: none;
-}
-
 .problem-drawer.closed .toggle-text,
 .problem-drawer.closed .header-content,
 .problem-drawer.closed .drawer-content {
@@ -182,10 +141,5 @@
   }
   .problem-drawer.closed {
     width: 32px;
-  }
-  .drawer-toggle {
-    width: 32px;
-    height: 32px;
-    right: -16px;
   }
 } 

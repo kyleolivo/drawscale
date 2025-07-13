@@ -55,6 +55,12 @@
   flex-direction: row;
   height: calc(100vh - 80px);
   width: 100%;
+  position: relative;
+  --drawer-width: 350px;
+}
+
+.canvas-container.drawer-closed {
+  --drawer-width: 40px;
 }
 
 .excalidraw-wrapper {
@@ -65,6 +71,43 @@
   /* ensures flex child shrinks properly */
 }
 
+.drawer-toggle {
+  position: absolute;
+  left: calc(var(--drawer-width) - 20px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 14px;
+  transition: all 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.drawer-toggle:hover {
+  background: #f9fafb;
+  color: #374151;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-arrow {
+  transition: transform 0.1s ease;
+  width: 16px;
+  height: 16px;
+}
+
+.toggle-arrow.open {
+  transform: rotate(180deg);
+}
+
 /* Remove margin-left logic */
 
 /* Responsive adjustments */
@@ -72,7 +115,14 @@
   .canvas-container {
     flex-direction: column;
   }
+  .canvas-container.drawer-closed {
+    --drawer-width: 32px;
+  }
   .excalidraw-wrapper {
     min-width: 0;
+  }
+  .drawer-toggle {
+    width: 32px;
+    height: 32px;
   }
 }

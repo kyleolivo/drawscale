@@ -29,15 +29,35 @@ function DrawCanvas(): JSX.Element {
           </div>
         </div>
       </header>
-      <div className="canvas-container">
+      <div className={`canvas-container ${isDrawerOpen ? 'drawer-open' : 'drawer-closed'}`}>
         <ProblemDrawer
           problem={DEFAULT_PROBLEM}
           isOpen={isDrawerOpen}
-          onToggle={handleDrawerToggle}
         />
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
           <Excalidraw />
         </div>
+        <button 
+          className="drawer-toggle"
+          onClick={handleDrawerToggle}
+          aria-label={isDrawerOpen ? 'Hide instructions' : 'Show instructions'}
+        >
+          <svg 
+            className={`toggle-arrow ${isDrawerOpen ? 'open' : ''}`}
+            width="16" 
+            height="16" 
+            viewBox="0 0 16 16" 
+            fill="none"
+          >
+            <path 
+              d="M6 12L10 8L6 4" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );
