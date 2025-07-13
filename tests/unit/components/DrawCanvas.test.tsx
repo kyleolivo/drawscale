@@ -1,3 +1,4 @@
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import DrawCanvas from '../../../src/components/DrawCanvas'
@@ -30,7 +31,9 @@ describe('DrawCanvas Component', () => {
   it('renders the header with correct content', () => {
     render(<DrawCanvas />)
     
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('DrawScale')
+    // Use getAllByRole to get all h1 elements and check the first one (the app header)
+    const headings = screen.getAllByRole('heading', { level: 1 });
+    expect(headings[0]).toHaveTextContent('DrawScale')
     expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument()
   })
 
