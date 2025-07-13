@@ -55,19 +55,13 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
     script.async = true;
     script.onload = () => {
       if (window.AppleID) {
-        const config = {
+        window.AppleID.auth.init({
           clientId: import.meta.env.VITE_APPLE_CLIENT_ID || 'your.app.bundle.id',
           scope: 'name email',
-          redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI || window.location.origin,
+          redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI || window.location.origin + '/auth/callback',
           state: 'auth',
           usePopup: true
-        };
-        
-        console.log('Initializing Apple Sign-In with config:', config);
-        console.log('Current domain:', window.location.hostname);
-        console.log('Full URL:', window.location.href);
-        
-        window.AppleID.auth.init(config);
+        });
       }
     };
     document.head.appendChild(script);
@@ -80,41 +74,13 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
   const handleAppleSignIn = async () => {
     try {
       if (window.AppleID) {
-        console.log('Starting Apple Sign-In...', {
-          clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
-          redirectURI: import.meta.env.VITE_APPLE_REDIRECT_URI,
-          currentOrigin: window.location.origin,
-          currentHref: window.location.href
-        });
-        
+        console.log('Starting Apple Sign-In...');
         const response = await window.AppleID.auth.signIn();
         console.log('Apple Sign-In response:', response);
         onSignIn(response);
       }
     } catch (error) {
       console.error('Apple Sign-In error:', error);
-      
-      // Type guard for error with error property
-      if (error && typeof error === 'object' && 'error' in error) {
-        const appleError = error as { error: string; toString(): string; stack?: string };
-        
-        console.error('Error details:', {
-          code: appleError.error,
-          message: appleError.toString(),
-          stack: appleError.stack
-        });
-        
-        // Common Apple Sign-In error codes
-        if (appleError.error === 'popup_closed_by_user') {
-          console.log('User closed the popup');
-        } else if (appleError.error === 'user_cancelled_authorize') {
-          console.log('User cancelled authorization');
-        } else if (appleError.error === 'invalid_request') {
-          console.error('Invalid request - check your Apple configuration');
-        }
-      } else {
-        console.error('Unknown error type:', error);
-      }
     }
   };
 
