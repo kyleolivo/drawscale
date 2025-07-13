@@ -102,7 +102,8 @@ describe('App Integration Tests', () => {
     });
     // Should show login page, not Excalidraw
     expect(screen.getByText('Sign in to access the drawing canvas')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign in with apple/i })).toBeInTheDocument()
+    // In test environment (development), should show dev button
+    expect(screen.getByText('Dev Sign In (Local Only)')).toBeInTheDocument()
     // Should not show Excalidraw
     const excalidrawWrapper = document.querySelector('.excalidraw-wrapper')
     expect(excalidrawWrapper).not.toBeInTheDocument()
