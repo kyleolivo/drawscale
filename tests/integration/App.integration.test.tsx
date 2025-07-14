@@ -87,7 +87,8 @@ describe('App Integration Tests', () => {
       render(<App />)
     });
     // Check that both header content and Excalidraw wrapper are present
-    expect(screen.getByText('DrawScale')).toBeInTheDocument()
+    // Use getByRole to be more specific about which DrawScale we want
+    expect(screen.getByRole('heading', { name: 'DrawScale', level: 1 })).toBeInTheDocument()
     expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument()
     expect(screen.getByText('Welcome, Test User')).toBeInTheDocument()
     const excalidrawWrapper = document.querySelector('.excalidraw-wrapper')

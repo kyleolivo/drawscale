@@ -83,15 +83,15 @@ function VoiceNotesPage(): JSX.Element {
       setCurrentAudio(null);
       setRecordingTime(0);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error transcribing audio:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('Error details:', {
-        message: error.message,
-        stack: error.stack,
-        response: error.response,
-        data: error.data
+        message: errorMessage,
+        error: error
       });
-      alert(`Transcription failed: ${error.message || 'Unknown error'}`);
+      alert(`Transcription failed: ${errorMessage}`);
     } finally {
       setIsTranscribing(false);
     }

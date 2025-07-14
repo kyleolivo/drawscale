@@ -46,7 +46,9 @@ describe('App Component', () => {
     
     // Should show the drawing canvas interface
     expect(screen.getByText('Welcome, Test User')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+    // Look for the specific logout button in the header
+    const headerSection = screen.getByText('Welcome, Test User').closest('.header-user')
+    expect(headerSection?.querySelector('.logout-button')).toBeInTheDocument()
     expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument()
   })
 
@@ -60,8 +62,9 @@ describe('App Component', () => {
 
     const { rerender } = render(<App />)
     
-    // Click sign out
-    const signOutButton = screen.getByRole('button', { name: /sign out/i })
+    // Click sign out - use the one in the header
+    const headerSection = screen.getByText('Welcome, Test User').closest('.header-user')
+    const signOutButton = headerSection?.querySelector('.logout-button') as HTMLButtonElement
     fireEvent.click(signOutButton)
 
     // Should call localStorage.removeItem
@@ -78,6 +81,6 @@ describe('App Component', () => {
   it('shows loading state initially', () => {
     render(<App />)
     // Component should handle loading state gracefully
-    expect(screen.getByText(/DrawScale|Loading/)).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('DrawScale')
   })
 })

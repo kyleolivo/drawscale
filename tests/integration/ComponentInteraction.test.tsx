@@ -236,7 +236,7 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Check header content
-      expect(screen.getByText('DrawScale')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'DrawScale', level: 1 })).toBeInTheDocument();
       expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument();
       expect(screen.getByText('Welcome, Test User')).toBeInTheDocument();
 
@@ -250,7 +250,8 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Initially drawer is open
-      expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
+      const headerSection = screen.getByText('Welcome, Test User').closest('.header-user')
+      expect(headerSection?.querySelector('.logout-button')).toBeInTheDocument();
 
       // Close drawer
       const toggleButton = screen.getByRole('button', { name: /hide instructions/i });
@@ -258,7 +259,8 @@ describe('Component Interaction Tests', () => {
 
       // Sign out button should still be functional
       await waitFor(() => {
-        const signOutButton = screen.getByRole('button', { name: /sign out/i });
+        const headerSection = screen.getByText('Welcome, Test User').closest('.header-user')
+        const signOutButton = headerSection?.querySelector('.logout-button')
         expect(signOutButton).toBeInTheDocument();
         expect(signOutButton).not.toBeDisabled();
       });

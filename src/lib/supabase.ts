@@ -33,7 +33,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string }
     }
     
     return data
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error calling Supabase function:', error)
     throw error
   }
