@@ -21,7 +21,18 @@ function VoiceNotesPage(): JSX.Element {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      
+      // Try different audio formats for better compatibility
+      let options: MediaRecorderOptions = {};
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        options = { mimeType: 'audio/webm;codecs=opus' };
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        options = { mimeType: 'audio/mp4' };
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        options = { mimeType: 'audio/wav' };
+      }
+      
+      const recorder = new MediaRecorder(stream, options);
       const chunks: Blob[] = [];
 
       recorder.ondataavailable = (event) => {
@@ -31,7 +42,9 @@ function VoiceNotesPage(): JSX.Element {
       };
 
       recorder.onstop = () => {
-        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        // Use the same MIME type that was used for recording
+        const mimeType = recorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(chunks, { type: mimeType });
         setCurrentAudio(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -104,7 +117,14 @@ function VoiceNotesPage(): JSX.Element {
   };
 
   const deleteTranscription = (id: string) => {
-    setTranscriptions(prev => prev.filter(t => t.id !== id));
+    setTranscriptions(prev => {
+      const transcriptionToDelete = prev.find(t => t.id === id);
+      if (transcriptionToDelete?.audioUrl) {
+        // Clean up the blob URL to prevent memory leaks
+        URL.revokeObjectURL(transcriptionToDelete.audioUrl);
+      }
+      return prev.filter(t => t.id !== id);
+    });
   };
 
   return (
@@ -146,9 +166,18 @@ function VoiceNotesPage(): JSX.Element {
 
           {currentAudio && !isRecording && (
             <div className="audio-preview">
+              <p>Audio recorded: {currentAudio.type} ({(currentAudio.size / 1024).toFixed(1)} KB)</p>
               <audio 
                 controls 
                 src={URL.createObjectURL(currentAudio)}
+                onError={(e) => {
+                  console.error('Audio playback error:', e);
+                  console.error('Audio blob details:', {
+                    type: currentAudio.type,
+                    size: currentAudio.size
+                  });
+                }}
+                onCanPlay={() => console.log('Audio can play')}
               />
               <div className="audio-actions">
                 <button 
@@ -200,6 +229,10 @@ function VoiceNotesPage(): JSX.Element {
                     controls 
                     src={transcription.audioUrl}
                     className="transcription-audio"
+                    onError={(e) => {
+                      console.error('Transcription audio playback error:', e);
+                    }}
+                    onCanPlay={() => console.log('Transcription audio can play')}
                   />
                 )}
               </div>
