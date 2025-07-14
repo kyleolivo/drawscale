@@ -32,7 +32,8 @@ test.describe('DrawScale Application', () => {
     // Should see main app header
     await expect(page.getByRole('heading', { name: 'DrawScale' })).toBeVisible();
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign out/i })).toBeVisible();
+    // Look for the logout button specifically in the header area
+    await expect(page.locator('.header-user .logout-button')).toBeVisible();
     
     // Should see Excalidraw
     await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
@@ -43,8 +44,8 @@ test.describe('DrawScale Application', () => {
     await mockAuthentication(page);
     await page.goto('/');
     
-    // Click sign out
-    await page.getByRole('button', { name: /sign out/i }).click();
+    // Click sign out - use the one in the header
+    await page.locator('.header-user .logout-button').click();
     
     // Should be back at login page
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
