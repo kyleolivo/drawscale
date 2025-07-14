@@ -29,7 +29,9 @@ describe('App Component', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('DrawScale')
     expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument()
     expect(screen.getByText('Sign in to access the drawing canvas')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sign in with apple/i })).toBeInTheDocument()
+    
+    // In test environment (development), should show dev button
+    expect(screen.getByText('Dev Sign In (Local Only)')).toBeInTheDocument()
   })
 
   it('renders main app when authenticated', () => {
