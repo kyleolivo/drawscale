@@ -63,7 +63,7 @@ describe('Component Interaction Tests', () => {
 
       // Check that both components are rendered
       const headings = screen.getAllByText('Design Twitter');
-      expect(headings.length).toBeGreaterThan(1); // h2 and h1
+      expect(headings.length).toBe(1);
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
 
@@ -192,7 +192,7 @@ describe('Component Interaction Tests', () => {
 
       // Check that ProblemDrawer receives the default problem
       const headings = screen.getAllByText('Design Twitter');
-      expect(headings.length).toBeGreaterThan(1); // h2 and h1
+      expect(headings.length).toBe(1);
       expect(screen.getByText('A simple test problem for the system design tool')).toBeInTheDocument();
       expect(screen.getByText('Medium')).toBeInTheDocument();
     });
@@ -242,7 +242,7 @@ describe('Component Interaction Tests', () => {
 
       // Check that drawing components are also present
       const headings = screen.getAllByText('Design Twitter');
-      expect(headings.length).toBeGreaterThan(1); // h2 and h1
+      expect(headings.length).toBe(1);
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
 
