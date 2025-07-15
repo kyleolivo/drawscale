@@ -48,7 +48,8 @@ export const DrawerToggle: React.FC<DrawerToggleProps> = ({
 
 const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
   problem,
-  isOpen = true
+  isOpen = true,
+  analysisResult
 }) => {
   const getDifficultyColor = (difficulty: DifficultyLevel): string => {
     switch (difficulty) {
@@ -86,6 +87,31 @@ const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
         <div className="problem-content">
           <ReactMarkdown>{problem.content}</ReactMarkdown>
         </div>
+        
+        {analysisResult && (
+          <div className="analysis-section">
+            <div className="analysis-header">
+              <h3>🎙️ AI Analysis</h3>
+              <span className="analysis-timestamp">
+                {analysisResult.timestamp.toLocaleTimeString()}
+              </span>
+            </div>
+            
+            <div className="analysis-content">
+              <div className="transcription-section">
+                <h4>📝 Your Commentary:</h4>
+                <p className="transcription-text">&ldquo;{analysisResult.transcription}&rdquo;</p>
+              </div>
+              
+              <div className="ai-analysis-section">
+                <h4>🤖 AI Feedback:</h4>
+                <div className="analysis-text">
+                  <ReactMarkdown>{analysisResult.analysis}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

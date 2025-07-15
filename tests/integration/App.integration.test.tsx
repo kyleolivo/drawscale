@@ -111,9 +111,12 @@ describe('App Integration Tests', () => {
   })
 
   it('integrates RecordButton with transcription functionality', async () => {
-    // Mock the transcribeAudio function
+    // Mock the transcribeAudioWithImage function
     vi.mock('../../../src/lib/supabase', () => ({
-      transcribeAudio: vi.fn().mockResolvedValue({ text: 'Test transcription' })
+      transcribeAudioWithImage: vi.fn().mockResolvedValue({ 
+        transcription: 'Test transcription',
+        analysis: 'Test analysis'
+      })
     }))
 
     await act(async () => {

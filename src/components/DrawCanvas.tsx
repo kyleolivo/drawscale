@@ -1,16 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Excalidraw } from "@excalidraw/excalidraw";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Excalidraw, exportToCanvas } from "@excalidraw/excalidraw";
+import type { ExcalidrawElement, AppState, BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import { useAuth } from '../hooks/useAuth';
 import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
 import RecordButton from './RecordButton';
 import { DEFAULT_PROBLEM } from '../constants/problems';
-import { transcribeAudio } from '../lib/supabase';
+import { transcribeAudioWithImage } from '../lib/supabase';
+import { AnalysisResult } from '../types/problem';
 import './DrawCanvas.css';
 
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
+  const [excalidrawElements, setExcalidrawElements] = useState<readonly ExcalidrawElement[]>([]);
+  const [excalidrawAppState, setExcalidrawAppState] = useState<AppState | null>(null);
+  const [excalidrawFiles, setExcalidrawFiles] = useState<BinaryFiles>({});
+  const isInitializing = useRef(true);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -27,15 +34,68 @@ function DrawCanvas(): JSX.Element {
     if (!isMobile) setIsDrawerOpen(!isDrawerOpen);
   };
 
+  const captureCanvasImage = async (): Promise<Blob | null> => {
+    if (!excalidrawElements || excalidrawElements.length === 0) {
+      console.error('No Excalidraw elements available');
+      return null;
+    }
+
+    try {
+      const canvas = await exportToCanvas({
+        elements: excalidrawElements,
+        appState: excalidrawAppState || {
+          viewBackgroundColor: "#ffffff",
+          exportBackground: true
+        },
+        files: excalidrawFiles,
+        getDimensions: () => ({ width: 800, height: 600 })
+      });
+      
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            console.error('Failed to create blob from canvas');
+            reject(new Error('Failed to create blob from canvas'));
+          }
+        }, 'image/png');
+      });
+    } catch (error) {
+      console.error('Error capturing canvas:', error);
+      return null;
+    }
+  };
+
+
   const handleTranscriptionSubmit = async (audioBlob: Blob) => {
     try {
-      const result = await transcribeAudio(audioBlob);
-      console.log('Transcription result:', result.text);
-      // TODO: Add logic to handle the transcribed text
-      alert(`Transcription: ${result.text}`);
+      // Capture the current canvas image
+      const imageBlob = await captureCanvasImage();
+      
+      if (!imageBlob) {
+        console.error('Canvas capture failed - unable to process recording');
+        alert('Unable to capture canvas image. Please try recording again.');
+        return;
+      }
+
+      const result = await transcribeAudioWithImage(audioBlob, imageBlob);
+      
+      // Set the analysis result to display in the problem drawer
+      setAnalysisResult({
+        transcription: result.transcription,
+        analysis: result.analysis,
+        timestamp: new Date()
+      });
+      
+      // Ensure the drawer is open to show the results
+      if (!isDrawerOpen && !isMobile) {
+        setIsDrawerOpen(true);
+      }
+      
     } catch (error) {
       console.error('Transcription error:', error);
-      alert('Failed to transcribe audio. Please try again.');
+      alert('Failed to process audio and image. Please try again.');
     }
   };
 
@@ -187,13 +247,25 @@ function DrawCanvas(): JSX.Element {
         <ProblemDrawer
           problem={DEFAULT_PROBLEM}
           isOpen={isDrawerOpen}
+          analysisResult={analysisResult}
         />
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
           <Excalidraw 
             initialData={{ 
-              elements: createSmileyFace() as readonly unknown[],
+              elements: createSmileyFace() as readonly ExcalidrawElement[],
               appState: { viewBackgroundColor: "#ffffff" }
             }}
+            onChange={useCallback((elements: readonly ExcalidrawElement[], appState: AppState, files: BinaryFiles) => {
+              // Skip the first few onChange calls during initialization
+              if (isInitializing.current) {
+                isInitializing.current = false;
+                return;
+              }
+              
+              setExcalidrawElements(elements);
+              setExcalidrawAppState(appState);
+              setExcalidrawFiles(files);
+            }, [])}
           />
         </div>
         <DrawerToggle

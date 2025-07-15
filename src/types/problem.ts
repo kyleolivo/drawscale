@@ -12,8 +12,15 @@ export interface SystemDesignProblem {
   content: string; // markdown content
 }
 
+export interface AnalysisResult {
+  transcription: string;
+  analysis: string;
+  timestamp: Date;
+}
+
 export interface ProblemDrawerProps {
   problem: SystemDesignProblem;
   isOpen?: boolean;
   onToggle?: () => void;
+  analysisResult?: AnalysisResult;
 } 

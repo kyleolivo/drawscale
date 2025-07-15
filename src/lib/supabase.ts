@@ -5,19 +5,25 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Function to call the transcribe edge function
-export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string }> {
-  console.log('Transcribing audio...', {
-    size: audioBlob.size,
-    type: audioBlob.type,
+// Function to call the transcribe and vision analysis edge function
+export async function transcribeAudioWithImage(
+  audioBlob: Blob, 
+  imageBlob: Blob
+): Promise<{ transcription: string; analysis: string }> {
+  console.log('Transcribing audio and analyzing image...', {
+    audioSize: audioBlob.size,
+    audioType: audioBlob.type,
+    imageSize: imageBlob.size,
+    imageType: imageBlob.type,
     supabaseUrl: supabaseUrl
   })
   
   const formData = new FormData()
   formData.append('audio', audioBlob, 'recording.webm')
+  formData.append('image', imageBlob, 'canvas.png')
   
   try {
-    const { data, error } = await supabase.functions.invoke('transcribe', {
+    const { data, error } = await supabase.functions.invoke('transcribe-with-vision', {
       body: formData,
     })
     
@@ -25,11 +31,11 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string }
     
     if (error) {
       console.error('Supabase function error:', error)
-      throw new Error(error.message || 'Transcription failed')
+      throw new Error(error.message || 'Transcription and vision analysis failed')
     }
     
-    if (!data || !data.text) {
-      throw new Error('Invalid response from transcription service')
+    if (!data || !data.transcription || !data.analysis) {
+      throw new Error('Invalid response from transcription and vision service')
     }
     
     return data
