@@ -243,31 +243,4 @@ describe('DrawCanvas Component', () => {
     })
   })
 
-  describe('Component Lifecycle', () => {
-    it('sets up mobile detection on mount', () => {
-      const mockMatchMedia = vi.fn(() => ({
-        matches: false,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-      }))
-      
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: mockMatchMedia,
-      })
-
-      render(<DrawCanvas />)
-      
-      expect(mockMatchMedia).toHaveBeenCalledWith('(max-width: 768px)')
-    })
-
-    it('cleans up event listeners on unmount', () => {
-      const mockRemoveEventListener = vi.spyOn(window, 'removeEventListener')
-      
-      const { unmount } = render(<DrawCanvas />)
-      unmount()
-      
-      expect(mockRemoveEventListener).toHaveBeenCalled()
-    })
-  })
 })

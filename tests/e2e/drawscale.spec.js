@@ -142,59 +142,44 @@ test.describe('DrawScale Application', () => {
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
   });
 
-  test('responsive drawer layout works correctly on mobile', async ({ page }) => {
+  test('drawer layout works correctly on different viewport sizes', async ({ page }) => {
     await mockAuthentication(page);
     await page.goto('/');
     
-    // Test desktop layout first (horizontal)
+    // Test desktop layout
     await page.setViewportSize({ width: 1200, height: 800 });
     await page.reload();
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
     
-    // Check that drawer toggle is visible on desktop
+    // Check that drawer toggle is visible
     const drawerToggle = page.locator('.drawer-toggle');
     await expect(drawerToggle).toBeVisible();
     
-    // Test mobile layout (vertical)
+    // Test smaller viewport
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
     
     // Wait for layout to adjust
     await page.waitForTimeout(150);
     
-    // Check that drawer content is visible on mobile - use specific selectors
+    // Check that drawer content is visible - use specific selectors
     await expect(page.locator('.problem-drawer .problem-title')).toBeVisible();
     await expect(page.locator('.problem-drawer .problem-description')).toBeVisible();
     await expect(page.locator('.problem-drawer .difficulty-badge')).toBeVisible();
     
-    // Check that drawer toggle is hidden on mobile
-    await expect(drawerToggle).not.toBeVisible();
+    // Drawer toggle should still be visible (no mobile-specific hiding)
+    await expect(drawerToggle).toBeVisible();
     
-    // Check that Excalidraw is still visible below the drawer
+    // Check that Excalidraw is still visible
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
     
-    // Verify the layout structure - drawer should be above canvas
+    // Verify the layout structure
     const canvasContainer = page.locator('.canvas-container');
     await expect(canvasContainer).toBeVisible();
     
-    // Check that problem drawer is present and has correct mobile styling
+    // Check that problem drawer is present
     const problemDrawer = page.locator('.problem-drawer');
     await expect(problemDrawer).toBeVisible();
-    
-    // Verify the drawer is full width on mobile (no border-right, has border-bottom)
-    const drawerStyle = await problemDrawer.evaluate(el => {
-      const styles = window.getComputedStyle(el);
-      return {
-        width: styles.width,
-        borderRight: styles.borderRight,
-        borderBottom: styles.borderBottom
-      };
-    });
-    
-    // Should be full width and have bottom border instead of right border
-    expect(drawerStyle.width).toBe('375px'); // full width on mobile
-    expect(drawerStyle.borderRight === 'none' || drawerStyle.borderRight.includes('none') || drawerStyle.borderRight.startsWith('0px')).toBe(true);
-    expect(drawerStyle.borderBottom).not.toBe('none');
   });
 
   test('RecordButton is visible and positioned correctly when authenticated', async ({ page }) => {

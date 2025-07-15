@@ -19,7 +19,7 @@ describe('ProblemDrawer', () => {
       />
     );
 
-    expect(screen.getByText('Design Twitter')).toBeInTheDocument();
+    expect(screen.getByText('Design Bitly')).toBeInTheDocument();
     expect(screen.getByText('A simple test problem for the system design tool')).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe('ProblemDrawer', () => {
       />
     );
 
-    const drawer = screen.getByText('Design Twitter').closest('.problem-drawer');
+    const drawer = screen.getByText('Design Bitly').closest('.problem-drawer');
     expect(drawer).toHaveClass('open');
     expect(drawer).not.toHaveClass('closed');
 
@@ -66,7 +66,7 @@ describe('ProblemDrawer', () => {
       />
     );
 
-    const closedDrawer = screen.getByText('Design Twitter').closest('.problem-drawer');
+    const closedDrawer = screen.getByText('Design Bitly').closest('.problem-drawer');
     expect(closedDrawer).toHaveClass('closed');
     expect(closedDrawer).not.toHaveClass('open');
   });
@@ -78,7 +78,7 @@ describe('ProblemDrawer', () => {
       />
     );
 
-    expect(screen.getByText('Design Twitter')).toBeInTheDocument();
+    expect(screen.getByText('Design Bitly')).toBeInTheDocument();
   });
 
   describe('Analysis Results Display', () => {

@@ -62,8 +62,8 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Check that both components are rendered
-      const headings = screen.getAllByText('Design Twitter');
-      expect(headings.length).toBe(1);
+      const headings = screen.getAllByText('Design Bitly');
+      expect(headings.length).toBe(2); // h2 in header and h1 in content
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
 
@@ -137,62 +137,14 @@ describe('Component Interaction Tests', () => {
     });
   });
 
-  describe('Responsive Behavior Integration', () => {
-    it('forces drawer open on mobile devices', () => {
-      // Mock mobile viewport
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: vi.fn().mockImplementation(query => ({
-          matches: query === '(max-width: 768px)',
-          media: query,
-          onchange: null,
-          addListener: vi.fn(),
-          removeListener: vi.fn(),
-          addEventListener: vi.fn(),
-          removeEventListener: vi.fn(),
-          dispatchEvent: vi.fn(),
-        })),
-      });
-
-      const { container } = renderWithAuth(<DrawCanvas />);
-
-      // On mobile, drawer should be forced open
-      const canvasContainer = container.querySelector('.canvas-container');
-      expect(canvasContainer).toHaveClass('drawer-open');
-    });
-
-    it('disables toggle button on mobile devices', () => {
-      // Mock mobile viewport
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: vi.fn().mockImplementation(query => ({
-          matches: query === '(max-width: 768px)',
-          media: query,
-          onchange: null,
-          addListener: vi.fn(),
-          removeListener: vi.fn(),
-          addEventListener: vi.fn(),
-          removeEventListener: vi.fn(),
-          dispatchEvent: vi.fn(),
-        })),
-      });
-
-      renderWithAuth(<DrawCanvas />);
-
-      // Use aria-label to select the toggle button
-      const toggleButton = screen.getByRole('button', { name: /instructions/i });
-      expect(toggleButton).toBeDisabled();
-      expect(toggleButton).toHaveClass('hide-mobile');
-    });
-  });
 
   describe('ProblemDrawer and DrawerToggle Integration', () => {
     it('passes correct props from DrawCanvas to ProblemDrawer', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Check that ProblemDrawer receives the default problem
-      const headings = screen.getAllByText('Design Twitter');
-      expect(headings.length).toBe(1);
+      const headings = screen.getAllByText('Design Bitly');
+      expect(headings.length).toBe(2); // h2 in header and h1 in content
       expect(screen.getByText('A simple test problem for the system design tool')).toBeInTheDocument();
       expect(screen.getByText('Medium')).toBeInTheDocument();
     });
@@ -203,8 +155,7 @@ describe('Component Interaction Tests', () => {
       // Check that DrawerToggle is rendered with correct initial state
       const toggleButton = screen.getByRole('button', { name: /instructions/i });
       expect(toggleButton).toBeInTheDocument();
-      // On mobile, it will be disabled
-      // expect(toggleButton).not.toBeDisabled();
+      expect(toggleButton).not.toBeDisabled();
     });
 
     it('maintains state consistency between components', async () => {
@@ -222,11 +173,11 @@ describe('Component Interaction Tests', () => {
       // Toggle drawer
       fireEvent.click(toggleButton);
 
-      // All components should reflect closed state (but on mobile, toggle is disabled, so state doesn't change)
+      // All components should reflect closed state
       await waitFor(() => {
-        expect(canvasContainer).toHaveClass('drawer-open'); // remains open on mobile
-        expect(excalidrawWrapper).toHaveClass('with-drawer');
-        expect(screen.getByRole('button', { name: /hide instructions/i })).toBeInTheDocument();
+        expect(canvasContainer).toHaveClass('drawer-closed');
+        expect(excalidrawWrapper).not.toHaveClass('with-drawer');
+        expect(screen.getByRole('button', { name: /show instructions/i })).toBeInTheDocument();
       });
     });
   });
@@ -241,8 +192,8 @@ describe('Component Interaction Tests', () => {
       expect(screen.getByText('Welcome, Test User')).toBeInTheDocument();
 
       // Check that drawing components are also present
-      const headings = screen.getAllByText('Design Twitter');
-      expect(headings.length).toBe(1);
+      const headings = screen.getAllByText('Design Bitly');
+      expect(headings.length).toBe(2); // h2 in header and h1 in content
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
 

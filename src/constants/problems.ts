@@ -5,7 +5,55 @@ export const DEFAULT_PROBLEM: SystemDesignProblem = {
   title: 'Design Bitly',
   description: 'A simple test problem for the system design tool',
   difficulty: DifficultyLevel.MEDIUM,
-content: `# Design Bitly`
+  content: `# Design Bitly
+
+Design a URL shortening service like Bitly that can:
+
+1. **Shorten URLs**: Take a long URL and return a short, unique URL
+2. **Redirect**: When users click the short URL, redirect them to the original URL
+3. **Analytics**: Track click counts and other metrics
+4. **Custom aliases**: Allow users to create custom short URLs
+
+## Key Requirements
+
+- Handle millions of URLs per day
+- Low latency for redirects (< 100ms)
+- High availability (99.9% uptime)
+- URL expiration support
+- Rate limiting to prevent abuse
+
+## System Components
+
+Consider these components in your design:
+- Load balancers
+- Web servers
+- Databases for URL storage
+- Caching layer
+- Analytics system`,
+  judgementCriteria: `Look for the following in the candidate's design:
+
+**Core System Design:**
+- Database schema for URL mappings (long URL -> short URL)
+- URL encoding/hashing strategy (base62, MD5, custom algorithm)
+- API design for shortening and redirecting
+- Caching strategy for popular URLs
+
+**Scalability Considerations:**
+- Database sharding/partitioning strategy
+- Load balancing approach
+- CDN usage for global distribution
+- Handling hot spots (viral URLs)
+
+**Data Storage:**
+- SQL vs NoSQL database choice and justification
+- Read-heavy vs write-heavy optimization
+- Analytics data storage (time series data)
+
+**Additional Features:**
+- Custom alias handling and collision detection
+- Rate limiting implementation
+- URL expiration and cleanup
+- Security considerations (malicious URLs, validation)`
 }; 
 
 export const PARKING_GARAGE_VALET: SystemDesignProblem = {

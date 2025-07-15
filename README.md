@@ -8,7 +8,7 @@ A system design interview prep tool.
 Run supabase functions locally:
 ```bash
 npx supabase start
-npx supabase functions serve --env-file ./supabase/.env.local --no-verify-jwt
+npx supabase functions serve --env-file .env.local --no-verify-jwt
 ```
 
 Curl a local supabase function:

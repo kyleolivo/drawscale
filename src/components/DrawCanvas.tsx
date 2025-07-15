@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Excalidraw, exportToCanvas } from "@excalidraw/excalidraw";
 import type { ExcalidrawElement, AppState, BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import { useAuth } from '../hooks/useAuth';
@@ -12,26 +12,14 @@ import './DrawCanvas.css';
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
   const [excalidrawElements, setExcalidrawElements] = useState<readonly ExcalidrawElement[]>([]);
   const [excalidrawAppState, setExcalidrawAppState] = useState<AppState | null>(null);
   const [excalidrawFiles, setExcalidrawFiles] = useState<BinaryFiles>({});
   const isInitializing = useRef(true);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.matchMedia('(max-width: 768px)').matches;
-      setIsMobile(mobile);
-      if (mobile) setIsDrawerOpen(true);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   const handleDrawerToggle = () => {
-    if (!isMobile) setIsDrawerOpen(!isDrawerOpen);
+    setIsDrawerOpen(!isDrawerOpen);
   };
 
   const captureCanvasImage = async (): Promise<Blob | null> => {
@@ -89,7 +77,7 @@ function DrawCanvas(): JSX.Element {
       });
       
       // Ensure the drawer is open to show the results
-      if (!isDrawerOpen && !isMobile) {
+      if (!isDrawerOpen) {
         setIsDrawerOpen(true);
       }
       
@@ -691,7 +679,7 @@ function DrawCanvas(): JSX.Element {
         <DrawerToggle
           isOpen={isDrawerOpen}
           onToggle={handleDrawerToggle}
-          isMobile={isMobile}
+          isMobile={false}
         />
         <RecordButton onTranscriptionSubmit={handleTranscriptionSubmit} />
       </div>

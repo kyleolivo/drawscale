@@ -62,7 +62,7 @@ test.describe('DrawScale Main Flows', () => {
     await expect(page.locator('.problem-drawer')).toBeVisible();
     
     // Should show problem content - target the specific title element
-    await expect(page.locator('.problem-title')).toContainText('Design Twitter');
+    await expect(page.locator('.problem-title')).toContainText('Design Bitly');
     
     // Drawer toggle should work on desktop
     const drawerToggle = page.locator('.drawer-toggle');
@@ -88,17 +88,17 @@ test.describe('DrawScale Main Flows', () => {
     await expect(page.locator('.excalidraw-wrapper')).not.toBeVisible();
   });
 
-  test('app is responsive on mobile', async ({ page }) => {
+  test('app works on smaller viewport', async ({ page }) => {
     await setupAuth(page);
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
     
-    // Main elements should still be visible on mobile
+    // Main elements should still be visible on smaller viewport
     await expect(page.getByRole('heading', { name: 'DrawScale' })).toBeVisible();
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible({ timeout: 10000 });
     await expect(page.locator('.record-button')).toBeVisible();
     
-    // Drawer should adapt to mobile layout
+    // Drawer should still be visible
     await expect(page.locator('.problem-drawer')).toBeVisible();
   });
 
