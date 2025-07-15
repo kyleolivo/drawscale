@@ -29,11 +29,11 @@ test.describe('DrawScale Application', () => {
     await mockAuthentication(page);
     await page.goto('/');
     
-    // Should see main app header
+    // Should see main app header in drawer
     await expect(page.getByRole('heading', { name: 'DrawScale' })).toBeVisible();
     await expect(page.getByText('Welcome, Test User')).toBeVisible();
-    // Look for the logout button specifically in the header area
-    await expect(page.locator('.header-user .logout-button')).toBeVisible();
+    // Look for the logout button specifically in the user info area
+    await expect(page.locator('.user-info .logout-button')).toBeVisible();
     
     // Should see Excalidraw
     await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
@@ -44,8 +44,8 @@ test.describe('DrawScale Application', () => {
     await mockAuthentication(page);
     await page.goto('/');
     
-    // Click sign out - use the one in the header
-    await page.locator('.header-user .logout-button').click();
+    // Click sign out - use the one in the user info area
+    await page.locator('.user-info .logout-button').click();
     
     // Should be back at login page
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
@@ -57,9 +57,9 @@ test.describe('DrawScale Application', () => {
     await mockAuthentication(page);
     await page.goto('/');
     
-    // Check header structure and styling
-    const header = page.locator('.App-header');
-    await expect(header).toBeVisible();
+    // Check header structure and styling in drawer
+    const appHeader = page.locator('.app-header');
+    await expect(appHeader).toBeVisible();
     
     const title = page.getByRole('heading', { name: 'DrawScale' });
     await expect(title).toBeVisible();
@@ -88,8 +88,8 @@ test.describe('DrawScale Application', () => {
     const appContainer = page.locator('.App');
     await expect(appContainer).toBeVisible();
     
-    // Verify header and drawing area are both present
-    await expect(page.locator('.App-header')).toBeVisible();
+    // Verify canvas container and drawing area are both present
+    await expect(page.locator('.canvas-container')).toBeVisible();
     await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
   });
 

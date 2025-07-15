@@ -49,7 +49,9 @@ export const DrawerToggle: React.FC<DrawerToggleProps> = ({
 const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
   problem,
   isOpen = true,
-  analysisResult
+  analysisResult,
+  user,
+  onSignOut
 }) => {
   const getDifficultyColor = (difficulty: DifficultyLevel): string => {
     switch (difficulty) {
@@ -71,16 +73,35 @@ const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
   return (
     <div className={`problem-drawer ${isOpen ? 'open' : 'closed'}`}>
       <div className="drawer-header">
-        <div className="header-content">
-          <h2 className="problem-title">{problem.title}</h2>
-          <div 
-            className="difficulty-badge"
-            style={{ backgroundColor: getDifficultyColor(problem.difficulty) }}
-          >
-            {getDifficultyText(problem.difficulty)}
+        <div className="app-header">
+          <div className="app-title">
+            <h1>DrawScale</h1>
+            <p>System Design Interview Prep Tool</p>
           </div>
+          {user && (
+            <div className="user-info">
+              <span>Welcome, {user.name || user.email || 'User'}</span>
+              {onSignOut && (
+                <button onClick={onSignOut} className="logout-button">
+                  Sign Out
+                </button>
+              )}
+            </div>
+          )}
         </div>
-        <p className="problem-description">{problem.description}</p>
+        
+        <div className="problem-header">
+          <div className="header-content">
+            <h2 className="problem-title">{problem.title}</h2>
+            <div 
+              className="difficulty-badge"
+              style={{ backgroundColor: getDifficultyColor(problem.difficulty) }}
+            >
+              {getDifficultyText(problem.difficulty)}
+            </div>
+          </div>
+          <p className="problem-description">{problem.description}</p>
+        </div>
       </div>
       
       <div className="drawer-content">

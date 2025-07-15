@@ -25,6 +25,71 @@
   background: #f9fafb;
 }
 
+/* App header styles within drawer */
+.app-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.app-title {
+  margin-bottom: 12px;
+}
+
+.app-title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.app-title p {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-info span {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.logout-button {
+  align-self: flex-start;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.logout-button:hover {
+  background: #dc2626;
+}
+
+.logout-button:focus {
+  outline: 2px solid #fca5a5;
+  outline-offset: 2px;
+}
+
+/* Problem header styles */
+.problem-header {
+  margin-top: 0;
+}
+
 .problem-drawer.closed .drawer-header {
   border-bottom: none;
 }

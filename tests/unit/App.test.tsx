@@ -46,9 +46,9 @@ describe('App Component', () => {
     
     // Should show the drawing canvas interface
     expect(screen.getByText('Welcome, Test User')).toBeInTheDocument()
-    // Look for the specific logout button in the header
-    const headerSection = screen.getByText('Welcome, Test User').closest('.header-user')
-    expect(headerSection?.querySelector('.logout-button')).toBeInTheDocument()
+    // Look for the specific logout button in the drawer
+    const userInfoSection = screen.getByText('Welcome, Test User').closest('.user-info')
+    expect(userInfoSection?.querySelector('.logout-button')).toBeInTheDocument()
     expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument()
   })
 
@@ -62,9 +62,9 @@ describe('App Component', () => {
 
     const { rerender } = render(<App />)
     
-    // Click sign out - use the one in the header
-    const headerSection = screen.getByText('Welcome, Test User').closest('.header-user')
-    const signOutButton = headerSection?.querySelector('.logout-button') as HTMLButtonElement
+    // Click sign out - use the one in the drawer
+    const userInfoSection = screen.getByText('Welcome, Test User').closest('.user-info')
+    const signOutButton = userInfoSection?.querySelector('.logout-button') as HTMLButtonElement
     fireEvent.click(signOutButton)
 
     // Should call localStorage.removeItem

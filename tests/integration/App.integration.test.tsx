@@ -74,12 +74,14 @@ describe('App Integration Tests', () => {
       ({ container } = render(<App />));
     });
     const appContainer = container.querySelector('.App')
-    const header = container.querySelector('.App-header')
+    const canvasContainer = container.querySelector('.canvas-container')
     const excalidrawWrapper = container.querySelector('.excalidraw-wrapper')
+    const problemDrawer = container.querySelector('.problem-drawer')
     // Check that the CSS classes are applied (styles are handled by CSS files)
     expect(appContainer).toHaveClass('App')
-    expect(header).toHaveClass('App-header')
+    expect(canvasContainer).toHaveClass('canvas-container')
     expect(excalidrawWrapper).toHaveClass('excalidraw-wrapper')
+    expect(problemDrawer).toHaveClass('problem-drawer')
   })
 
   it('integrates with the complete application structure when authenticated', async () => {

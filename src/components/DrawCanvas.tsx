@@ -229,25 +229,13 @@ function DrawCanvas(): JSX.Element {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <div className="header-content">
-          <div className="header-title">
-            <h1>DrawScale</h1>
-            <p>System Design Interview Prep Tool</p>
-          </div>
-          <div className="header-user">
-            <span>Welcome, {user?.name || user?.email || 'User'}</span>
-            <button onClick={signOut} className="logout-button">
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
       <div className={`canvas-container ${isDrawerOpen ? 'drawer-open' : 'drawer-closed'}`}>
         <ProblemDrawer
           problem={DEFAULT_PROBLEM}
           isOpen={isDrawerOpen}
           analysisResult={analysisResult}
+          user={user || undefined}
+          onSignOut={signOut}
         />
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
           <Excalidraw 

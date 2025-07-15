@@ -99,24 +99,26 @@ describe('DrawCanvas Component', () => {
     const { container } = render(<DrawCanvas />)
     
     const appDiv = container.querySelector('.App')
-    const header = container.querySelector('.App-header')
+    const canvasContainer = container.querySelector('.canvas-container')
     const excalidrawWrapper = container.querySelector('.excalidraw-wrapper')
+    const problemDrawer = container.querySelector('.problem-drawer')
     
     expect(appDiv).toBeInTheDocument()
-    expect(header).toBeInTheDocument()
+    expect(canvasContainer).toBeInTheDocument()
     expect(excalidrawWrapper).toBeInTheDocument()
+    expect(problemDrawer).toBeInTheDocument()
   })
 
-  it('has correct header structure', () => {
+  it('has correct drawer structure with app header', () => {
     const { container } = render(<DrawCanvas />)
     
-    const headerContent = container.querySelector('.header-content')
-    const headerTitle = container.querySelector('.header-title')
-    const headerUser = container.querySelector('.header-user')
+    const appHeader = container.querySelector('.app-header')
+    const appTitle = container.querySelector('.app-title')
+    const userInfo = container.querySelector('.user-info')
     
-    expect(headerContent).toBeInTheDocument()
-    expect(headerTitle).toBeInTheDocument()
-    expect(headerUser).toBeInTheDocument()
+    expect(appHeader).toBeInTheDocument()
+    expect(appTitle).toBeInTheDocument()
+    expect(userInfo).toBeInTheDocument()
   })
 
   describe('Canvas Capture Functionality', () => {
