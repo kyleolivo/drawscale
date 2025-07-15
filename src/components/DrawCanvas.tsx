@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { Excalidraw } from "@excalidraw/excalidraw";
 import { useAuth } from '../hooks/useAuth';
 import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
+import RecordButton from './RecordButton';
 import { DEFAULT_PROBLEM } from '../constants/problems';
+import { transcribeAudio } from '../lib/supabase';
 import './DrawCanvas.css';
 
 function DrawCanvas(): JSX.Element {
@@ -23,6 +25,18 @@ function DrawCanvas(): JSX.Element {
 
   const handleDrawerToggle = () => {
     if (!isMobile) setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const handleTranscriptionSubmit = async (audioBlob: Blob) => {
+    try {
+      const result = await transcribeAudio(audioBlob);
+      console.log('Transcription result:', result.text);
+      // TODO: Add logic to handle the transcribed text
+      alert(`Transcription: ${result.text}`);
+    } catch (error) {
+      console.error('Transcription error:', error);
+      alert('Failed to transcribe audio. Please try again.');
+    }
   };
 
   return (
@@ -54,6 +68,7 @@ function DrawCanvas(): JSX.Element {
           onToggle={handleDrawerToggle}
           isMobile={isMobile}
         />
+        <RecordButton onTranscriptionSubmit={handleTranscriptionSubmit} />
       </div>
     </div>
   );

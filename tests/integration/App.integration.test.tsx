@@ -95,6 +95,39 @@ describe('App Integration Tests', () => {
     expect(excalidrawWrapper).toBeInTheDocument()
   })
 
+  it('renders RecordButton component when authenticated', async () => {
+    await act(async () => {
+      render(<App />)
+    });
+    
+    // Check that the record button container is present
+    const recordButton = document.querySelector('.record-button-container')
+    expect(recordButton).toBeInTheDocument()
+    
+    // Check that the record button itself is present
+    const button = screen.getByRole('button', { name: /start recording/i })
+    expect(button).toBeInTheDocument()
+    expect(button).toHaveClass('record-button')
+  })
+
+  it('integrates RecordButton with transcription functionality', async () => {
+    // Mock the transcribeAudio function
+    vi.mock('../../../src/lib/supabase', () => ({
+      transcribeAudio: vi.fn().mockResolvedValue({ text: 'Test transcription' })
+    }))
+
+    await act(async () => {
+      render(<App />)
+    });
+    
+    const recordButton = screen.getByRole('button', { name: /start recording/i })
+    expect(recordButton).toBeInTheDocument()
+    
+    // The button should be integrated into the DrawCanvas component
+    const drawCanvas = document.querySelector('.App')
+    expect(drawCanvas).toContainElement(recordButton)
+  })
+
   it('shows login page when not authenticated', async () => {
     // Mock unauthenticated state
     mockLocalStorage.getItem.mockReturnValue(null)

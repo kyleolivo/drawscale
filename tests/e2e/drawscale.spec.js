@@ -197,6 +197,145 @@ test.describe('DrawScale Application', () => {
     expect(drawerStyle.borderBottom).not.toBe('none');
   });
 
+  test('RecordButton is visible and positioned correctly when authenticated', async ({ page }) => {
+    await mockAuthentication(page);
+    await page.goto('/');
+    
+    // Wait for app to load
+    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
+    
+    // Check that record button container is present
+    const recordButtonContainer = page.locator('.record-button-container');
+    await expect(recordButtonContainer).toBeVisible();
+    
+    // Check that record button is present with correct aria-label
+    const recordButton = page.getByRole('button', { name: /start recording/i });
+    await expect(recordButton).toBeVisible();
+    
+    // Verify button has correct CSS classes
+    await expect(recordButton).toHaveClass(/record-button/);
+    
+    // Check positioning - should be fixed and positioned in bottom-right area
+    const buttonBox = await recordButton.boundingBox();
+    const viewportSize = page.viewportSize();
+    
+    // Button should be in the bottom-right quadrant
+    expect(buttonBox.x).toBeGreaterThan(viewportSize.width / 2);
+    expect(buttonBox.y).toBeGreaterThan(viewportSize.height / 2);
+  });
+
+  test('RecordButton is not visible when not authenticated', async ({ page }) => {
+    await page.goto('/');
+    
+    // Should see login page
+    await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
+    
+    // Record button should not be present
+    const recordButton = page.locator('.record-button-container');
+    await expect(recordButton).not.toBeVisible();
+  });
+
+  test('RecordButton has correct initial state and visual feedback', async ({ page }) => {
+    await mockAuthentication(page);
+    await page.goto('/');
+    
+    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
+    
+    const recordButton = page.getByRole('button', { name: /start recording/i });
+    await expect(recordButton).toBeVisible();
+    
+    // Should not have recording class initially
+    await expect(recordButton).not.toHaveClass(/recording/);
+    
+    // Should have microphone SVG icon
+    const svgIcon = recordButton.locator('svg');
+    await expect(svgIcon).toBeVisible();
+    
+    // Check SVG has microphone paths
+    const pathElements = svgIcon.locator('path');
+    await expect(pathElements).toHaveCount(2); // Microphone icon has 2 paths
+  });
+
+  test('RecordButton handles clicks without errors', async ({ page }) => {
+    await mockAuthentication(page);
+    
+    // Mock navigator.mediaDevices.getUserMedia to prevent permission dialogs
+    await page.addInitScript(() => {
+      // Mock getUserMedia to fail gracefully for E2E testing
+      window.navigator.mediaDevices = {
+        getUserMedia: () => Promise.reject(new Error('Media access denied in test environment'))
+      };
+    });
+    
+    await page.goto('/');
+    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
+    
+    const recordButton = page.getByRole('button', { name: /start recording/i });
+    await expect(recordButton).toBeVisible();
+    
+    // Click the button - should handle the error gracefully
+    await recordButton.click();
+    
+    // Button should remain in initial state due to permission error
+    await expect(recordButton).toHaveAttribute('aria-label', /start recording/i);
+    await expect(recordButton).not.toHaveClass(/recording/);
+    
+    // Verify the button is still clickable after error
+    await recordButton.click();
+    await expect(recordButton).toBeVisible();
+  });
+
+  test('RecordButton works correctly on different viewport sizes', async ({ page }) => {
+    await mockAuthentication(page);
+    
+    // Test on desktop
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await page.goto('/');
+    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
+    
+    let recordButton = page.getByRole('button', { name: /start recording/i });
+    await expect(recordButton).toBeVisible();
+    
+    // Test on tablet
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.waitForTimeout(150);
+    await expect(recordButton).toBeVisible();
+    
+    // Test on mobile
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.waitForTimeout(150);
+    await expect(recordButton).toBeVisible();
+    
+    // On all sizes, button should be positioned correctly
+    const buttonBox = await recordButton.boundingBox();
+    expect(buttonBox.x).toBeGreaterThan(0);
+    expect(buttonBox.y).toBeGreaterThan(0);
+    expect(buttonBox.x + buttonBox.width).toBeLessThan(375); // Within viewport width
+    expect(buttonBox.y + buttonBox.height).toBeLessThan(667); // Within viewport height
+  });
+
+  test('RecordButton has proper accessibility attributes', async ({ page }) => {
+    await mockAuthentication(page);
+    await page.goto('/');
+    
+    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
+    
+    const recordButton = page.getByRole('button', { name: /start recording/i });
+    await expect(recordButton).toBeVisible();
+    
+    // Check accessibility attributes
+    await expect(recordButton).toHaveAttribute('aria-label', /start recording/i);
+    
+    // Should be focusable
+    await recordButton.focus();
+    await expect(recordButton).toBeFocused();
+    
+    // Should be activatable with keyboard
+    await recordButton.press('Space');
+    // Note: In real E2E, this would trigger recording, but we're not testing
+    // actual media recording in E2E due to permission complexity
+  });
+
   test('no console errors on page load', async ({ page }) => {
     const consoleErrors = [];
     page.on('console', msg => {
