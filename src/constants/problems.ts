@@ -1,9 +1,9 @@
 import { SystemDesignProblem, DifficultyLevel } from '../types/problem';
 
 export const DEFAULT_PROBLEM: SystemDesignProblem = {
-  id: 'twitter-design',
-  title: 'Design Twitter',
+  id: 'bitly-design',
+  title: 'Design Bitly',
   description: 'A simple test problem for the system design tool',
   difficulty: DifficultyLevel.MEDIUM,
-  content: `# Design Twitter`
+  content: `# Design Bitly`
 }; 

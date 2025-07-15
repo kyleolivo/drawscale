@@ -165,10 +165,10 @@ describe('DrawCanvas Component', () => {
     })
   })
 
-  describe('Smiley Face Creation', () => {
-    it('renders without errors when smiley face is created', () => {
+  describe('System Diagram Creation', () => {
+    it('renders without errors when Bitly system diagram is created', () => {
       // This test verifies that the component renders successfully
-      // which means the smiley face creation doesn't cause any errors
+      // which means the Bitly system diagram creation doesn't cause any errors
       const { container } = render(<DrawCanvas />)
       
       expect(container.querySelector('.excalidraw-wrapper')).toBeInTheDocument()
