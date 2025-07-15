@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import RecordButton from '../../../src/components/RecordButton';
@@ -208,8 +209,8 @@ describe('RecordButton', () => {
       expect(mockMediaRecorder.start).toHaveBeenCalled();
     });
 
-    // Simulate empty data event
-    const mockEvent = { data: { size: 0 } };
+    // Simulate empty data event  
+    const mockEvent = { data: new Blob([], { type: 'audio/webm' }) };
     
     if (mockMediaRecorder.ondataavailable) {
       mockMediaRecorder.ondataavailable(mockEvent);

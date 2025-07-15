@@ -39,6 +39,134 @@ function DrawCanvas(): JSX.Element {
     }
   };
 
+  // Create initial smiley face elements
+  const createSmileyFace = () => {
+    const centerX = 400;
+    const centerY = 300;
+    const faceRadius = 80;
+    
+    return [
+      // Face circle
+      {
+        id: 'smiley-face',
+        type: 'ellipse',
+        x: centerX - faceRadius,
+        y: centerY - faceRadius,
+        width: faceRadius * 2,
+        height: faceRadius * 2,
+        angle: 0,
+        strokeColor: '#1e1e1e',
+        backgroundColor: '#ffec99',
+        fillStyle: 'solid',
+        strokeWidth: 3,
+        strokeStyle: 'solid',
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: 12345,
+        versionNonce: 12345,
+        isDeleted: false,
+        boundElements: null,
+        updated: 1,
+        link: null,
+        locked: false,
+        version: 1
+      },
+      // Left eye
+      {
+        id: 'smiley-left-eye',
+        type: 'ellipse',
+        x: centerX - 30,
+        y: centerY - 30,
+        width: 15,
+        height: 15,
+        angle: 0,
+        strokeColor: '#1e1e1e',
+        backgroundColor: '#1e1e1e',
+        fillStyle: 'solid',
+        strokeWidth: 2,
+        strokeStyle: 'solid',
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: 12346,
+        versionNonce: 12346,
+        isDeleted: false,
+        boundElements: null,
+        updated: 1,
+        link: null,
+        locked: false,
+        version: 1
+      },
+      // Right eye
+      {
+        id: 'smiley-right-eye',
+        type: 'ellipse',
+        x: centerX + 15,
+        y: centerY - 30,
+        width: 15,
+        height: 15,
+        angle: 0,
+        strokeColor: '#1e1e1e',
+        backgroundColor: '#1e1e1e',
+        fillStyle: 'solid',
+        strokeWidth: 2,
+        strokeStyle: 'solid',
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: 12347,
+        versionNonce: 12347,
+        isDeleted: false,
+        boundElements: null,
+        updated: 1,
+        link: null,
+        locked: false,
+        version: 1
+      },
+      // Smile - curved line
+      {
+        id: 'smiley-mouth',
+        type: 'line',
+        x: centerX - 35,
+        y: centerY + 20,
+        width: 70,
+        height: 30,
+        angle: 0,
+        strokeColor: '#1e1e1e',
+        backgroundColor: 'transparent',
+        fillStyle: 'solid',
+        strokeWidth: 3,
+        strokeStyle: 'solid',
+        roughness: 1,
+        opacity: 100,
+        groupIds: [],
+        frameId: null,
+        roundness: null,
+        seed: 12348,
+        versionNonce: 12348,
+        isDeleted: false,
+        boundElements: null,
+        updated: 1,
+        link: null,
+        locked: false,
+        version: 1,
+        points: [[0, 0], [17, 15], [35, 20], [53, 15], [70, 0]],
+        lastCommittedPoint: [70, 0],
+        startBinding: null,
+        endBinding: null,
+        startArrowhead: null,
+        endArrowhead: null
+      }
+    ];
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -61,7 +189,12 @@ function DrawCanvas(): JSX.Element {
           isOpen={isDrawerOpen}
         />
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
-          <Excalidraw />
+          <Excalidraw 
+            initialData={{ 
+              elements: createSmileyFace() as readonly unknown[],
+              appState: { viewBackgroundColor: "#ffffff" }
+            }}
+          />
         </div>
         <DrawerToggle
           isOpen={isDrawerOpen}
