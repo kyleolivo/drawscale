@@ -162,10 +162,23 @@ test.describe('DrawScale Application', () => {
     // Wait for layout to adjust
     await page.waitForTimeout(150);
     
-    // Check that drawer content is visible - use specific selectors
-    await expect(page.locator('.problem-drawer .problem-title')).toBeVisible();
-    await expect(page.locator('.problem-drawer .problem-description')).toBeVisible();
-    await expect(page.locator('.problem-drawer .difficulty-badge')).toBeVisible();
+    // Check that problem picker content is visible (directory view)
+    const cardTitleLocator = page.locator('.problem-card-title');
+    const cardDescriptionLocator = page.locator('.problem-card-description');
+    await expect(cardTitleLocator.first()).toBeVisible();
+    await expect(cardDescriptionLocator.first()).toBeVisible();
+    const badgeLocator = page.locator('.difficulty-badge');
+    await expect(badgeLocator.first()).toBeVisible();
+    
+    // Simulate selecting the first problem to enter presentation view
+    const firstProblemCard = page.locator('.problem-card').first();
+    await firstProblemCard.click();
+    await page.waitForTimeout(150);
+    
+    // Now check for problem presentation view content
+    await expect(page.locator('.problem-title')).toBeVisible();
+    await expect(page.locator('.problem-description')).toBeVisible();
+    await expect(page.locator('.difficulty-badge')).toBeVisible();
     
     // Drawer toggle should still be visible (no mobile-specific hiding)
     await expect(drawerToggle).toBeVisible();

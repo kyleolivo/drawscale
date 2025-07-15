@@ -1,3 +1,5 @@
+import { DrawCanvasAppState } from './appState';
+
 export enum DifficultyLevel {
   EASY = 'easy',
   MEDIUM = 'medium',
@@ -26,10 +28,10 @@ export interface User {
 }
 
 export interface ProblemDrawerProps {
-  problem: SystemDesignProblem;
+  appState: DrawCanvasAppState;
   isOpen?: boolean;
   onToggle?: () => void;
-  analysisResult?: AnalysisResult;
   user?: User;
   onSignOut?: () => void;
+  onProblemSelect?: (problem: SystemDesignProblem) => void;
 } 

@@ -6,20 +6,33 @@ import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
 import RecordButton from './RecordButton';
 import { DEFAULT_PROBLEM } from '../constants/problems';
 import { transcribeAudioWithImage } from '../lib/supabase';
-import { AnalysisResult } from '../types/problem';
+
+import { ApplicationState, DrawCanvasAppState } from '../types/appState';
+import { SystemDesignProblem } from '../types/problem';
 import './DrawCanvas.css';
 
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | undefined>(undefined);
   const [excalidrawElements, setExcalidrawElements] = useState<readonly ExcalidrawElement[]>([]);
   const [excalidrawAppState, setExcalidrawAppState] = useState<AppState | null>(null);
   const [excalidrawFiles, setExcalidrawFiles] = useState<BinaryFiles>({});
+  const [appState, setAppState] = useState<DrawCanvasAppState>({
+    currentState: ApplicationState.PROBLEMS_DIRECTORY,
+    currentProblem: DEFAULT_PROBLEM
+  });
   const isInitializing = useRef(true);
 
   const handleDrawerToggle = () => {
     setIsDrawerOpen(!isDrawerOpen);
+  };
+
+  const handleProblemSelect = (problem: SystemDesignProblem) => {
+    setAppState(prevState => ({
+      ...prevState,
+      currentState: ApplicationState.PROBLEM_PRESENTATION,
+      currentProblem: problem
+    }));
   };
 
   const captureCanvasImage = async (): Promise<Blob | null> => {
@@ -69,12 +82,15 @@ function DrawCanvas(): JSX.Element {
 
       const result = await transcribeAudioWithImage(audioBlob, imageBlob);
       
-      // Set the analysis result to display in the problem drawer
-      setAnalysisResult({
-        transcription: result.transcription,
-        analysis: result.analysis,
-        timestamp: new Date()
-      });
+      // Update the app state with the analysis result
+      setAppState(prevState => ({
+        ...prevState,
+        analysisResult: {
+          transcription: result.transcription,
+          analysis: result.analysis,
+          timestamp: new Date()
+        }
+      }));
       
       // Ensure the drawer is open to show the results
       if (!isDrawerOpen) {
@@ -651,11 +667,11 @@ function DrawCanvas(): JSX.Element {
     <div className="App">
       <div className={`canvas-container ${isDrawerOpen ? 'drawer-open' : 'drawer-closed'}`}>
         <ProblemDrawer
-          problem={DEFAULT_PROBLEM}
+          appState={appState}
           isOpen={isDrawerOpen}
-          analysisResult={analysisResult}
           user={user || undefined}
           onSignOut={signOut}
+          onProblemSelect={handleProblemSelect}
         />
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
           <Excalidraw 

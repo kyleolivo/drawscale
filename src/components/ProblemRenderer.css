@@ -1,0 +1,110 @@
+/* Problem Header Styles */
+.problem-header {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.problem-header-section {
+  margin: -20px -20px 20px -20px;
+  padding: 20px 20px 12px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  border-radius: 8px 8px 0 0;
+}
+
+.problem-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.problem-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.difficulty-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.problem-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Problem Content Styles */
+.problem-content {
+  color: #111827;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.problem-content h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #111827;
+}
+
+.problem-content h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 24px 0 12px 0;
+  color: #111827;
+}
+
+.problem-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 20px 0 10px 0;
+  color: #111827;
+}
+
+.problem-content p {
+  margin: 0 0 12px 0;
+}
+
+.problem-content ul,
+.problem-content ol {
+  margin: 12px 0;
+  padding-left: 20px;
+}
+
+.problem-content li {
+  margin: 4px 0;
+}
+
+.problem-content code {
+  background: #f3f4f6;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+}
+
+.problem-content pre {
+  background: #f9fafb;
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.problem-content pre code {
+  background: none;
+  padding: 0;
+}
+
+ 

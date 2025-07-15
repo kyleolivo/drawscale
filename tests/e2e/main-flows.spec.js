@@ -61,7 +61,16 @@ test.describe('DrawScale Main Flows', () => {
     // Wait for app to load
     await expect(page.locator('.problem-drawer')).toBeVisible();
     
-    // Should show problem content - target the specific title element
+    // Should show problem picker content - target the specific title element
+    const cardTitleLocator = page.locator('.problem-card-title');
+    await expect(cardTitleLocator.first()).toBeVisible();
+    
+    // Simulate selecting the first problem to enter presentation view
+    const firstProblemCard = page.locator('.problem-card').first();
+    await firstProblemCard.click();
+    await page.waitForTimeout(150);
+    
+    // Now check for problem presentation view content
     await expect(page.locator('.problem-title')).toContainText('Design Bitly');
     
     // Drawer toggle should work on desktop

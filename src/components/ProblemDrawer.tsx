@@ -1,6 +1,11 @@
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import { ProblemDrawerProps, DifficultyLevel } from '../types/problem';
+import { ProblemDrawerProps } from '../types/problem';
+import { ApplicationState } from '../types/appState';
+import ProblemRenderer from './ProblemRenderer';
+import ProblemAnalysis from './ProblemAnalysis';
+import ProblemPicker from './ProblemPicker';
+import AppHeader from './AppHeader';
+import { PROBLEMS } from '../constants/problems';
 import './ProblemDrawer.css';
 
 interface DrawerToggleProps {
@@ -47,91 +52,36 @@ export const DrawerToggle: React.FC<DrawerToggleProps> = ({
 };
 
 const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
-  problem,
+  appState,
   isOpen = true,
-  analysisResult,
   user,
-  onSignOut
+  onSignOut,
+  onProblemSelect
 }) => {
-  const getDifficultyColor = (difficulty: DifficultyLevel): string => {
-    switch (difficulty) {
-      case DifficultyLevel.EASY:
-        return '#10b981'; // green
-      case DifficultyLevel.MEDIUM:
-        return '#f59e0b'; // amber
-      case DifficultyLevel.HARD:
-        return '#ef4444'; // red
-      default:
-        return '#6b7280'; // gray
-    }
-  };
-
-  const getDifficultyText = (difficulty: DifficultyLevel): string => {
-    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
-  };
-
   return (
     <div className={`problem-drawer ${isOpen ? 'open' : 'closed'}`}>
       <div className="drawer-header">
-        <div className="app-header">
-          <div className="app-title">
-            <h1>DrawScale</h1>
-            <p>System Design Interview Prep Tool</p>
-          </div>
-          {user && (
-            <div className="user-info">
-              <span>Welcome, {user.name || user.email || 'User'}</span>
-              {onSignOut && (
-                <button onClick={onSignOut} className="logout-button">
-                  Sign Out
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-        
-        <div className="problem-header">
-          <div className="header-content">
-            <h2 className="problem-title">{problem.title}</h2>
-            <div 
-              className="difficulty-badge"
-              style={{ backgroundColor: getDifficultyColor(problem.difficulty) }}
-            >
-              {getDifficultyText(problem.difficulty)}
-            </div>
-          </div>
-          <p className="problem-description">{problem.description}</p>
-        </div>
+        <AppHeader user={user} onSignOut={onSignOut} />
       </div>
       
       <div className="drawer-content">
-        <div className="problem-content">
-          <ReactMarkdown>{problem.content}</ReactMarkdown>
-        </div>
-        
-        {analysisResult && (
-          <div className="analysis-section">
-            <div className="analysis-header">
-              <h3>🎙️ AI Analysis</h3>
-              <span className="analysis-timestamp">
-                {analysisResult.timestamp.toLocaleTimeString()}
-              </span>
-            </div>
+        {appState.currentState === ApplicationState.PROBLEM_PRESENTATION && (
+          <>
+            <ProblemRenderer 
+              problem={appState.currentProblem}
+            />
             
-            <div className="analysis-content">
-              <div className="transcription-section">
-                <h4>📝 Your Commentary:</h4>
-                <p className="transcription-text">&ldquo;{analysisResult.transcription}&rdquo;</p>
-              </div>
-              
-              <div className="ai-analysis-section">
-                <h4>🤖 AI Feedback:</h4>
-                <div className="analysis-text">
-                  <ReactMarkdown>{analysisResult.analysis}</ReactMarkdown>
-                </div>
-              </div>
-            </div>
-          </div>
+            {appState.analysisResult && (
+              <ProblemAnalysis analysisResult={appState.analysisResult} />
+            )}
+          </>
+        )}
+        
+        {appState.currentState === ApplicationState.PROBLEMS_DIRECTORY && (
+          <ProblemPicker 
+            problems={PROBLEMS}
+            onProblemSelect={onProblemSelect}
+          />
         )}
       </div>
     </div>
