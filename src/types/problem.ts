@@ -10,6 +10,7 @@ export interface SystemDesignProblem {
   description: string;
   difficulty: DifficultyLevel;
   content: string; // markdown content
+  judgementCriteria: string; // markdown content
 }
 
 export interface AnalysisResult {
