@@ -48,16 +48,17 @@ describe('DrawCanvas Component', () => {
     // Use getAllByRole to get all h1 elements and check the first one (the app header)
     const headings = screen.getAllByRole('heading', { level: 1 });
     expect(headings[0]).toHaveTextContent('DrawScale')
-    expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument()
+    // Check for user initials instead of subtitle
+    expect(screen.getByText('TU')).toBeInTheDocument()
   })
 
-  it('displays user name in welcome message', () => {
+  it('displays user initials in avatar', () => {
     render(<DrawCanvas />)
     
-    expect(screen.getByText('Welcome, Test User')).toBeInTheDocument()
+    expect(screen.getByText('TU')).toBeInTheDocument()
   })
 
-  it('displays user email when name is not available', async () => {
+  it('displays user email initials when name is not available', async () => {
     const { useAuth } = await import('../../../src/hooks/useAuth')
     vi.mocked(useAuth).mockReturnValueOnce({
       user: { ...mockUser, name: undefined },
@@ -69,7 +70,7 @@ describe('DrawCanvas Component', () => {
     
     render(<DrawCanvas />)
     
-    expect(screen.getByText('Welcome, test@example.com')).toBeInTheDocument()
+    expect(screen.getByText('TE')).toBeInTheDocument()
   })
 
   it('renders sign out button', () => {
@@ -114,11 +115,11 @@ describe('DrawCanvas Component', () => {
     
     const appHeader = container.querySelector('.app-header')
     const appTitle = container.querySelector('.app-title')
-    const userInfo = container.querySelector('.user-info')
+    const userSection = container.querySelector('.user-section')
     
     expect(appHeader).toBeInTheDocument()
     expect(appTitle).toBeInTheDocument()
-    expect(userInfo).toBeInTheDocument()
+    expect(userSection).toBeInTheDocument()
   })
 
   describe('Canvas Capture Functionality', () => {

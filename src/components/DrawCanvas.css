@@ -19,5 +19,26 @@
   /* ensures flex child shrinks properly */
 }
 
-/* Remove margin-left logic */
+/* Resize Handle */
+.resize-handle {
+  position: absolute;
+  right: var(--drawer-width);
+  top: 0;
+  width: 4px;
+  height: 100vh;
+  background: linear-gradient(90deg, transparent 0%, #e2e8f0 50%, transparent 100%);
+  cursor: ew-resize;
+  z-index: 1001;
+  transition: background 0.2s ease;
+}
+
+.resize-handle:hover {
+  background: linear-gradient(90deg, transparent 0%, #3b82f6 50%, transparent 100%);
+  width: 6px;
+  right: calc(var(--drawer-width) + 1px);
+}
+
+.resize-handle:active {
+  background: linear-gradient(90deg, transparent 0%, #1d4ed8 50%, transparent 100%);
+}
 

@@ -5,14 +5,13 @@ import '@testing-library/jest-dom';
 import AppHeader from '../../../src/components/AppHeader';
 
 describe('AppHeader', () => {
-  it('renders app title and description', () => {
+  it('renders app title', () => {
     render(<AppHeader />);
 
     expect(screen.getByText('DrawScale')).toBeInTheDocument();
-    expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument();
   });
 
-  it('renders user info when user is provided', () => {
+  it('renders user avatar and sign out button when user is provided', () => {
     const mockUser = {
       id: '1',
       name: 'John Doe',
@@ -27,11 +26,23 @@ describe('AppHeader', () => {
       />
     );
 
-    expect(screen.getByText('Welcome, John Doe')).toBeInTheDocument();
-    expect(screen.getByText('Sign Out')).toBeInTheDocument();
+    expect(screen.getByText('JD')).toBeInTheDocument(); // User initials
+    expect(screen.getByTitle('Sign Out')).toBeInTheDocument(); // Icon button with title
   });
 
-  it('renders user email when name is not provided', () => {
+  it('renders correct initials from user name', () => {
+    const mockUser = {
+      id: '1',
+      name: 'John Smith Doe',
+      email: 'john@example.com'
+    };
+
+    render(<AppHeader user={mockUser} />);
+
+    expect(screen.getByText('JS')).toBeInTheDocument(); // First two initials
+  });
+
+  it('renders initials from email when name is not provided', () => {
     const mockUser = {
       id: '1',
       email: 'john@example.com'
@@ -39,24 +50,24 @@ describe('AppHeader', () => {
 
     render(<AppHeader user={mockUser} />);
 
-    expect(screen.getByText('Welcome, john@example.com')).toBeInTheDocument();
+    expect(screen.getByText('JO')).toBeInTheDocument(); // First two letters of email
   });
 
-  it('renders generic user text when neither name nor email is provided', () => {
+  it('renders generic initial when neither name nor email is provided', () => {
     const mockUser = {
       id: '1'
     };
 
     render(<AppHeader user={mockUser} />);
 
-    expect(screen.getByText('Welcome, User')).toBeInTheDocument();
+    expect(screen.getByText('U')).toBeInTheDocument(); // Generic 'U' for User
   });
 
-  it('does not render user info when user is not provided', () => {
+  it('does not render user section when user is not provided', () => {
     render(<AppHeader />);
 
-    expect(screen.queryByText(/Welcome/)).not.toBeInTheDocument();
-    expect(screen.queryByText('Sign Out')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Sign Out')).not.toBeInTheDocument();
+    expect(document.querySelector('.user-section')).not.toBeInTheDocument();
   });
 
   it('calls onSignOut when sign out button is clicked', () => {
@@ -73,7 +84,7 @@ describe('AppHeader', () => {
       />
     );
 
-    screen.getByText('Sign Out').click();
+    screen.getByTitle('Sign Out').click();
     expect(mockSignOut).toHaveBeenCalledTimes(1);
   });
 
@@ -85,8 +96,8 @@ describe('AppHeader', () => {
 
     render(<AppHeader user={mockUser} />);
 
-    expect(screen.getByText('Welcome, John Doe')).toBeInTheDocument();
-    expect(screen.queryByText('Sign Out')).not.toBeInTheDocument();
+    expect(screen.getByText('JD')).toBeInTheDocument(); // Avatar still shows
+    expect(screen.queryByTitle('Sign Out')).not.toBeInTheDocument(); // But no sign out button
   });
 
   it('renders with correct CSS classes', () => {
@@ -99,7 +110,7 @@ describe('AppHeader', () => {
     expect(title).toBeInTheDocument();
   });
 
-  it('renders user info with correct CSS classes when user is provided', () => {
+  it('renders user section with correct CSS classes when user is provided', () => {
     const mockUser = {
       id: '1',
       name: 'John Doe'
@@ -113,10 +124,13 @@ describe('AppHeader', () => {
       />
     );
 
-    const userInfo = screen.getByText('Welcome, John Doe').closest('.user-info');
-    expect(userInfo).toBeInTheDocument();
+    const userSection = document.querySelector('.user-section');
+    expect(userSection).toBeInTheDocument();
     
-    const logoutButton = screen.getByText('Sign Out');
+    const userAvatar = document.querySelector('.user-avatar');
+    expect(userAvatar).toBeInTheDocument();
+    
+    const logoutButton = screen.getByTitle('Sign Out');
     expect(logoutButton).toHaveClass('logout-button');
   });
 }); 

@@ -27,7 +27,6 @@ describe('App Component', () => {
     render(<App />)
     
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('DrawScale')
-    expect(screen.getByText('System Design Interview Prep Tool')).toBeInTheDocument()
     expect(screen.getByText('Sign in to access the drawing canvas')).toBeInTheDocument()
     
     // In test environment (development), should show dev button
@@ -44,11 +43,11 @@ describe('App Component', () => {
 
     render(<App />)
     
-    // Should show the drawing canvas interface
-    expect(screen.getByText('Welcome, Test User')).toBeInTheDocument()
-    // Look for the specific logout button in the drawer
-    const userInfoSection = screen.getByText('Welcome, Test User').closest('.user-info')
-    expect(userInfoSection?.querySelector('.logout-button')).toBeInTheDocument()
+    // Should show the drawing canvas interface with user initials
+    expect(screen.getByText('TU')).toBeInTheDocument()
+    // Look for the specific logout button in the user section
+    const userSection = screen.getByText('TU').closest('.user-section')
+    expect(userSection?.querySelector('.logout-button')).toBeInTheDocument()
     expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument()
   })
 
@@ -62,9 +61,9 @@ describe('App Component', () => {
 
     const { rerender } = render(<App />)
     
-    // Click sign out - use the one in the drawer
-    const userInfoSection = screen.getByText('Welcome, Test User').closest('.user-info')
-    const signOutButton = userInfoSection?.querySelector('.logout-button') as HTMLButtonElement
+    // Click sign out - use the one in the user section
+    const userSection = screen.getByText('TU').closest('.user-section')
+    const signOutButton = userSection?.querySelector('.logout-button') as HTMLButtonElement
     fireEvent.click(signOutButton)
 
     // Should call localStorage.removeItem

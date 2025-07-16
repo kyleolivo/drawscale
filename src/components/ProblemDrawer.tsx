@@ -51,15 +51,16 @@ export const DrawerToggle: React.FC<DrawerToggleProps> = ({
   );
 };
 
-const ProblemDrawer: React.FC<ProblemDrawerProps> = ({
+const ProblemDrawer: React.FC<ProblemDrawerProps & { style?: React.CSSProperties }> = ({
   appState,
   isOpen = true,
   user,
   onSignOut,
-  onProblemSelect
+  onProblemSelect,
+  style
 }) => {
   return (
-    <div className={`problem-drawer ${isOpen ? 'open' : 'closed'}`}>
+    <div className={`problem-drawer ${isOpen ? 'open' : 'closed'}`} style={style}>
       <div className="drawer-header">
         <AppHeader user={user} onSignOut={onSignOut} />
       </div>

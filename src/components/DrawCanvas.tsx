@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Excalidraw, exportToCanvas } from "@excalidraw/excalidraw";
 import type { ExcalidrawElement, AppState, BinaryFiles } from "@excalidraw/excalidraw/types/types";
 import { useAuth } from '../hooks/useAuth';
@@ -14,6 +14,8 @@ import './DrawCanvas.css';
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [drawerWidth, setDrawerWidth] = useState(350);
+  const [isResizing, setIsResizing] = useState(false);
   const [excalidrawElements, setExcalidrawElements] = useState<readonly ExcalidrawElement[]>([]);
   const [excalidrawAppState, setExcalidrawAppState] = useState<AppState | null>(null);
   const [excalidrawFiles, setExcalidrawFiles] = useState<BinaryFiles>({});
@@ -26,6 +28,47 @@ function DrawCanvas(): JSX.Element {
   const handleDrawerToggle = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing) return;
+    
+    const newWidth = window.innerWidth - e.clientX;
+    const minWidth = 250;
+    const maxWidth = Math.min(600, window.innerWidth * 0.6);
+    
+    setDrawerWidth(Math.max(minWidth, Math.min(maxWidth, newWidth)));
+  }, [isResizing]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Add global mouse events for resizing
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'ew-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
 
   const handleProblemSelect = (problem: SystemDesignProblem) => {
     setAppState(prevState => ({
@@ -665,14 +708,10 @@ function DrawCanvas(): JSX.Element {
 
   return (
     <div className="App">
-      <div className={`canvas-container ${isDrawerOpen ? 'drawer-open' : 'drawer-closed'}`}>
-        <ProblemDrawer
-          appState={appState}
-          isOpen={isDrawerOpen}
-          user={user || undefined}
-          onSignOut={signOut}
-          onProblemSelect={handleProblemSelect}
-        />
+      <div 
+        className={`canvas-container ${isDrawerOpen ? 'drawer-open' : 'drawer-closed'}`}
+        style={{ '--drawer-width': `${isDrawerOpen ? drawerWidth : 20}px` } as React.CSSProperties}
+      >
         <div className={`excalidraw-wrapper ${isDrawerOpen ? 'with-drawer' : ''}`}>
           <Excalidraw 
             initialData={{ 
@@ -692,6 +731,20 @@ function DrawCanvas(): JSX.Element {
             }, [])}
           />
         </div>
+        {isDrawerOpen && (
+          <div 
+            className="resize-handle"
+            onMouseDown={handleMouseDown}
+          />
+        )}
+        <ProblemDrawer
+          appState={appState}
+          isOpen={isDrawerOpen}
+          user={user || undefined}
+          onSignOut={signOut}
+          onProblemSelect={handleProblemSelect}
+          style={{ width: isDrawerOpen ? `${drawerWidth}px` : '20px' }}
+        />
         <DrawerToggle
           isOpen={isDrawerOpen}
           onToggle={handleDrawerToggle}

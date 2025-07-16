@@ -1,28 +1,30 @@
 .problem-drawer {
-  /* Remove position: fixed, left, top, z-index, box-shadow */
   height: 100vh;
-  background: white;
-  border-right: 1px solid #e5e7eb;
-  transition: width 0.1s ease-in-out;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-left: 1px solid #e2e8f0;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   flex-shrink: 0;
-  /* width is set by open/closed classes */
   position: relative;
+  backdrop-filter: blur(8px);
 }
 
 .problem-drawer.open {
-  width: 350px;
+  /* Width will be set dynamically via inline style */
 }
 
 .problem-drawer.closed {
   width: 20px;
-  background: #f9fafb;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.04);
 }
 
 .drawer-header {
-  padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(8px);
 }
 
 .problem-drawer.closed .drawer-header {
@@ -34,43 +36,63 @@
 }
 
 .drawer-content {
-  padding: 20px 20px 40px 20px;
-  height: calc(100vh - 120px);
+  padding: 20px;
+  height: calc(100vh - 100px);
   overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.drawer-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.drawer-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Drawer Toggle Button Styles */
 .drawer-toggle {
   position: absolute;
-  left: calc(var(--drawer-width) - 20px);
+  right: calc(var(--drawer-width) - 20px);
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   cursor: pointer;
-  color: #6b7280;
-  font-size: 14px;
-  transition: all 0.1s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  color: #64748b;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  z-index: 1002;
+  backdrop-filter: blur(8px);
 }
 
 .drawer-toggle:hover {
-  background: #f9fafb;
-  color: #374151;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #475569;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12), 0 3px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-50%) scale(1.05);
 }
 
 .toggle-arrow {
-  transition: transform 0.1s ease;
-  width: 16px;
-  height: 16px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 18px;
+  height: 18px;
 }
 
 .toggle-arrow.open {
