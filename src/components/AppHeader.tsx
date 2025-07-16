@@ -5,11 +5,15 @@ import './AppHeader.css';
 interface AppHeaderProps {
   user?: User;
   onSignOut?: () => void;
+  onBackToProblems?: () => void;
+  showBackButton?: boolean;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
   user,
-  onSignOut
+  onSignOut,
+  onBackToProblems,
+  showBackButton = false
 }) => {
   const getUserInitials = (user: User): string => {
     if (user.name) {
@@ -24,6 +28,28 @@ const AppHeader: React.FC<AppHeaderProps> = ({
   return (
     <div className="app-header">
       <div className="app-title">
+        {showBackButton && onBackToProblems && (
+          <button 
+            className="back-button-header" 
+            onClick={onBackToProblems}
+            aria-label="Back to problems list"
+          >
+            <svg 
+              width="16" 
+              height="16" 
+              viewBox="0 0 16 16" 
+              fill="none"
+            >
+              <path 
+                d="M10 12L6 8L10 4" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
         <h1>DrawScale</h1>
       </div>
       {user && (

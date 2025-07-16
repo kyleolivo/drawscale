@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import AppHeader from '../../../src/components/AppHeader';
@@ -132,5 +132,80 @@ describe('AppHeader', () => {
     
     const logoutButton = screen.getByTitle('Sign Out');
     expect(logoutButton).toHaveClass('logout-button');
+  });
+
+  describe('Back Button Functionality', () => {
+    it('does not render back button when showBackButton is false', () => {
+      render(<AppHeader showBackButton={false} />);
+
+      expect(screen.queryByLabelText('Back to problems list')).not.toBeInTheDocument();
+    });
+
+    it('does not render back button when showBackButton is true but onBackToProblems is not provided', () => {
+      render(<AppHeader showBackButton={true} />);
+
+      expect(screen.queryByLabelText('Back to problems list')).not.toBeInTheDocument();
+    });
+
+    it('renders back button when showBackButton is true and onBackToProblems is provided', () => {
+      const mockOnBackToProblems = vi.fn();
+
+      render(
+        <AppHeader 
+          showBackButton={true} 
+          onBackToProblems={mockOnBackToProblems}
+        />
+      );
+
+      expect(screen.getByLabelText('Back to problems list')).toBeInTheDocument();
+      expect(screen.getByLabelText('Back to problems list')).toHaveClass('back-button-header');
+    });
+
+    it('calls onBackToProblems when back button is clicked', () => {
+      const mockOnBackToProblems = vi.fn();
+
+      render(
+        <AppHeader 
+          showBackButton={true} 
+          onBackToProblems={mockOnBackToProblems}
+        />
+      );
+
+      const backButton = screen.getByLabelText('Back to problems list');
+      fireEvent.click(backButton);
+
+      expect(mockOnBackToProblems).toHaveBeenCalledTimes(1);
+    });
+
+    it('renders back button with correct structure and SVG icon', () => {
+      const mockOnBackToProblems = vi.fn();
+
+      render(
+        <AppHeader 
+          showBackButton={true} 
+          onBackToProblems={mockOnBackToProblems}
+        />
+      );
+
+      const backButton = screen.getByLabelText('Back to problems list');
+      expect(backButton.querySelector('svg')).toBeInTheDocument();
+      expect(backButton.querySelector('path')).toBeInTheDocument();
+    });
+
+    it('positions back button correctly in app-title section', () => {
+      const mockOnBackToProblems = vi.fn();
+
+      render(
+        <AppHeader 
+          showBackButton={true} 
+          onBackToProblems={mockOnBackToProblems}
+        />
+      );
+
+      const backButton = screen.getByLabelText('Back to problems list');
+      const appTitle = screen.getByText('DrawScale').closest('.app-title');
+      
+      expect(appTitle).toContainElement(backButton);
+    });
   });
 }); 

@@ -18,8 +18,8 @@ describe('ProblemRenderer', () => {
       />
     );
 
-    expect(screen.getByText('Design Bitly')).toBeInTheDocument();
-    expect(screen.getByText('A simple test problem for the system design tool')).toBeInTheDocument();
+    expect(screen.getByText('Blog Platform')).toBeInTheDocument();
+    expect(screen.getByText('Simple blogging platform where users create accounts and publish articles.')).toBeInTheDocument();
   });
 
   it('renders difficulty badge with correct color and text', () => {
@@ -29,9 +29,9 @@ describe('ProblemRenderer', () => {
       />
     );
 
-    const badge = screen.getByText('Medium');
+    const badge = screen.getByText('Easy');
     expect(badge).toBeInTheDocument();
-    expect(badge).toHaveStyle({ backgroundColor: '#f59e0b' });
+    expect(badge).toHaveStyle({ backgroundColor: '#10b981' });
   });
 
   it('renders markdown content', () => {

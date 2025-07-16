@@ -7,6 +7,12 @@
   padding-bottom: 8px;
 }
 
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .app-title h1 {
   margin: 0;
   font-size: 20px;
@@ -14,6 +20,38 @@
   color: #1e293b;
   line-height: 1.2;
   letter-spacing: -0.025em;
+}
+
+.back-button-header {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.back-button-header:hover {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #cbd5e1;
+  transform: translateX(-1px);
+}
+
+.back-button-header:active {
+  transform: translateX(0);
+  background: #e2e8f0;
+}
+
+.back-button-header:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
 
 .user-section {

@@ -20,8 +20,8 @@ describe('ProblemDrawer', () => {
 
   it('renders the problem when in PROBLEM_PRESENTATION state', () => {
     render(<ProblemDrawer {...baseProps} />);
-    // There may be multiple 'Design Bitly' headings (title and markdown)
-    expect(screen.getAllByText('Design Bitly').length).toBeGreaterThanOrEqual(1);
+    // There may be multiple 'Blog Platform' headings (title and markdown)
+    expect(screen.getAllByText('Blog Platform').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders the problem picker when in PROBLEMS_DIRECTORY state', () => {

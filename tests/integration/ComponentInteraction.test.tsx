@@ -62,7 +62,7 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Check that both components are rendered
-      const headings = screen.getAllByText('Design Bitly');
+      const headings = screen.getAllByText('Bitly');
       expect(headings.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
@@ -143,9 +143,9 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Check that ProblemDrawer receives the default problem
-      const headings = screen.getAllByText('Design Bitly');
+      const headings = screen.getAllByText('Bitly');
       expect(headings.length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('A simple test problem for the system design tool')).toBeInTheDocument();
+      expect(screen.getByText('URL shortening service that converts long URLs into short, shareable links.')).toBeInTheDocument();
       // Check for Medium difficulty badges - there should be multiple since both problems are Medium
       const mediumBadges = screen.getAllByText('Medium');
       expect(mediumBadges.length).toBeGreaterThanOrEqual(1);
@@ -194,7 +194,7 @@ describe('Component Interaction Tests', () => {
       expect(screen.getByText('TU')).toBeInTheDocument(); // Test User initials
 
       // Check that drawing components are also present
-      const headings = screen.getAllByText('Design Bitly');
+      const headings = screen.getAllByText('Bitly');
       expect(headings.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
@@ -216,6 +216,102 @@ describe('Component Interaction Tests', () => {
         const signOutButton = userSection?.querySelector('.logout-button')
         expect(signOutButton).toBeInTheDocument();
         expect(signOutButton).not.toBeDisabled();
+      });
+    });
+  });
+
+  describe('Problem Navigation Flow', () => {
+    it('shows back button in header when viewing a specific problem', () => {
+      renderWithAuth(<DrawCanvas />);
+
+      // Initially in problems directory - no back button should be visible
+      expect(screen.queryByLabelText('Back to problems list')).not.toBeInTheDocument();
+
+      // Click on a problem to view it
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]); // Click the first problem card
+
+      // Now we should see the back button in the header
+      expect(screen.getByLabelText('Back to problems list')).toBeInTheDocument();
+    });
+
+    it('navigates back to problems list when back button is clicked', async () => {
+      renderWithAuth(<DrawCanvas />);
+
+      // Click on a problem to view it
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]);
+
+      // Verify we're viewing the problem (back button should be visible)
+      expect(screen.getByLabelText('Back to problems list')).toBeInTheDocument();
+
+      // Click the back button
+      const backButton = screen.getByLabelText('Back to problems list');
+      fireEvent.click(backButton);
+
+      // Should return to problems directory - back button should disappear
+      await waitFor(() => {
+        expect(screen.queryByLabelText('Back to problems list')).not.toBeInTheDocument();
+      });
+
+      // Should show the problem picker again
+      expect(screen.getByText('Choose a System Design Problem')).toBeInTheDocument();
+    });
+
+    it('maintains proper component state during navigation', async () => {
+      const { container } = renderWithAuth(<DrawCanvas />);
+
+      // Initially should show problem picker
+      expect(screen.getByText('Choose a System Design Problem')).toBeInTheDocument();
+      expect(container.querySelector('.problem-picker')).toBeInTheDocument();
+
+      // Navigate to a problem
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]);
+
+      // Should show problem renderer instead of picker
+      await waitFor(() => {
+        expect(container.querySelector('.problem-renderer')).toBeInTheDocument();
+        expect(container.querySelector('.problem-picker')).not.toBeInTheDocument();
+      });
+
+      // Navigate back
+      const backButton = screen.getByLabelText('Back to problems list');
+      fireEvent.click(backButton);
+
+      // Should show picker again, not renderer
+      await waitFor(() => {
+        expect(container.querySelector('.problem-picker')).toBeInTheDocument();
+        expect(container.querySelector('.problem-renderer')).not.toBeInTheDocument();
+      });
+    });
+
+    it('back button works correctly with drawer toggle state', async () => {
+      renderWithAuth(<DrawCanvas />);
+
+      // Navigate to a problem
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]);
+
+      // Verify back button is present
+      expect(screen.getByLabelText('Back to problems list')).toBeInTheDocument();
+
+      // Close the drawer
+      const toggleButton = screen.getByRole('button', { name: /hide instructions/i });
+      fireEvent.click(toggleButton);
+
+      // Back button should still be functional even when drawer is closed
+      await waitFor(() => {
+        expect(screen.getByLabelText('Back to problems list')).toBeInTheDocument();
+      });
+
+      // Click back button
+      const backButton = screen.getByLabelText('Back to problems list');
+      fireEvent.click(backButton);
+
+      // Should navigate back successfully
+      await waitFor(() => {
+        expect(screen.queryByLabelText('Back to problems list')).not.toBeInTheDocument();
       });
     });
   });

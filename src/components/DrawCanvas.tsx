@@ -78,6 +78,13 @@ function DrawCanvas(): JSX.Element {
     }));
   };
 
+  const handleBackToProblems = () => {
+    setAppState(prevState => ({
+      ...prevState,
+      currentState: ApplicationState.PROBLEMS_DIRECTORY
+    }));
+  };
+
   const captureCanvasImage = async (): Promise<Blob | null> => {
     if (!excalidrawElements || excalidrawElements.length === 0) {
       console.error('No Excalidraw elements available');
@@ -743,6 +750,7 @@ function DrawCanvas(): JSX.Element {
           user={user || undefined}
           onSignOut={signOut}
           onProblemSelect={handleProblemSelect}
+          onBackToProblems={handleBackToProblems}
           style={{ width: isDrawerOpen ? `${drawerWidth}px` : '20px' }}
         />
         <DrawerToggle

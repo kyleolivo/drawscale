@@ -21,8 +21,12 @@ describe('ProblemPicker', () => {
     );
 
     expect(screen.getByText('Choose a System Design Problem')).toBeInTheDocument();
-    expect(screen.getByText('Design Bitly')).toBeInTheDocument();
+    expect(screen.getByText('Blog Platform')).toBeInTheDocument();
+    expect(screen.getByText('Bitly')).toBeInTheDocument();
     expect(screen.getByText('Parking Garage Valet')).toBeInTheDocument();
+    expect(screen.getByText('WhatsApp')).toBeInTheDocument();
+    expect(screen.getByText('YouTube')).toBeInTheDocument();
+    expect(screen.getByText('Uber')).toBeInTheDocument();
   });
 
   it('displays problem information correctly', () => {
@@ -34,16 +38,21 @@ describe('ProblemPicker', () => {
     );
 
     // Check for problem titles
-    expect(screen.getByText('Design Bitly')).toBeInTheDocument();
+    expect(screen.getByText('Blog Platform')).toBeInTheDocument();
+    expect(screen.getByText('Bitly')).toBeInTheDocument();
     expect(screen.getByText('Parking Garage Valet')).toBeInTheDocument();
 
     // Check for problem descriptions
-    expect(screen.getByText('A simple test problem for the system design tool')).toBeInTheDocument();
-    expect(screen.getByText('System to orchestrate parking garage valets and customers.')).toBeInTheDocument();
+    expect(screen.getByText('Simple blogging platform where users create accounts and publish articles.')).toBeInTheDocument();
+    expect(screen.getByText('URL shortening service that converts long URLs into short, shareable links.')).toBeInTheDocument();
+    expect(screen.getByText('Smart parking system that manages valet operations and customer experience.')).toBeInTheDocument();
 
-    // Check for difficulty badges (both problems are Medium difficulty)
-    const difficultyBadges = screen.getAllByText('Medium');
-    expect(difficultyBadges).toHaveLength(2);
+    // Check for difficulty badges (we now have Easy, Medium, and Hard difficulties)
+    expect(screen.getByText('Easy')).toBeInTheDocument();
+    const mediumBadges = screen.getAllByText('Medium');
+    expect(mediumBadges.length).toBeGreaterThanOrEqual(1);
+    const hardBadges = screen.getAllByText('Hard');
+    expect(hardBadges.length).toBeGreaterThanOrEqual(1);
   });
 
   it('calls onProblemSelect when a problem card is clicked', () => {
@@ -54,7 +63,7 @@ describe('ProblemPicker', () => {
       />
     );
 
-    const firstProblemCard = screen.getByText('Design Bitly').closest('.problem-card');
+    const firstProblemCard = screen.getByText('Blog Platform').closest('.problem-card');
     expect(firstProblemCard).toBeInTheDocument();
 
     fireEvent.click(firstProblemCard!);
@@ -69,7 +78,7 @@ describe('ProblemPicker', () => {
       />
     );
 
-    const firstProblemCard = screen.getByText('Design Bitly').closest('.problem-card');
+    const firstProblemCard = screen.getByText('Blog Platform').closest('.problem-card');
     expect(firstProblemCard).toBeInTheDocument();
 
     fireEvent.keyDown(firstProblemCard!, { key: 'Enter' });
@@ -84,7 +93,7 @@ describe('ProblemPicker', () => {
       />
     );
 
-    const firstProblemCard = screen.getByText('Design Bitly').closest('.problem-card');
+    const firstProblemCard = screen.getByText('Blog Platform').closest('.problem-card');
     expect(firstProblemCard).toBeInTheDocument();
 
     fireEvent.keyDown(firstProblemCard!, { key: ' ' });
@@ -99,7 +108,7 @@ describe('ProblemPicker', () => {
       />
     );
 
-    const firstProblemCard = screen.getByText('Design Bitly').closest('.problem-card');
+    const firstProblemCard = screen.getByText('Blog Platform').closest('.problem-card');
     expect(firstProblemCard).toBeInTheDocument();
 
     fireEvent.keyDown(firstProblemCard!, { key: 'Tab' });
