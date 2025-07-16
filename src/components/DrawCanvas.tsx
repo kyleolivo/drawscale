@@ -130,7 +130,15 @@ function DrawCanvas(): JSX.Element {
         return;
       }
 
-      const result = await transcribeAudioWithImage(audioBlob, imageBlob);
+      // Prepare problem context for evaluation
+      const problemContext = {
+        title: appState.currentProblem.title,
+        description: appState.currentProblem.description,
+        content: appState.currentProblem.content,
+        judgementCriteria: appState.currentProblem.judgementCriteria
+      };
+      
+      const result = await transcribeAudioWithImage(audioBlob, imageBlob, problemContext);
       
       // Update the app state with the analysis result
       setAppState(prevState => ({

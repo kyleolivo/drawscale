@@ -49,7 +49,13 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string }
 // Function to call the transcribe and vision analysis edge function
 export async function transcribeAudioWithImage(
   audioBlob: Blob, 
-  imageBlob: Blob
+  imageBlob: Blob,
+  problemContext?: {
+    title: string;
+    description: string;
+    content: string;
+    judgementCriteria: string;
+  }
 ): Promise<{ transcription: string; analysis: string }> {
   console.log('Transcribing audio and analyzing image...', {
     audioSize: audioBlob.size,
@@ -62,6 +68,11 @@ export async function transcribeAudioWithImage(
   const formData = new FormData()
   formData.append('audio', audioBlob, 'recording.webm')
   formData.append('image', imageBlob, 'canvas.png')
+  
+  // Add problem context if provided
+  if (problemContext) {
+    formData.append('problemContext', JSON.stringify(problemContext))
+  }
   
   try {
     const { data, error } = await supabase.functions.invoke('transcribe-with-vision', {

@@ -23,10 +23,11 @@ serve(async (req) => {
       )
     }
 
-    // Get the audio and image files from the form data
+    // Get the audio, image files, and problem context from the form data
     const formData = await req.formData()
     const audioFile = formData.get('audio') as File
     const imageFile = formData.get('image') as File
+    const problemContextJson = formData.get('problemContext') as string
 
     if (!audioFile || !imageFile) {
       return new Response(
@@ -36,6 +37,16 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
+    }
+
+    // Parse problem context if provided
+    let problemContext = null
+    if (problemContextJson) {
+      try {
+        problemContext = JSON.parse(problemContextJson)
+      } catch (error) {
+        console.warn('Failed to parse problem context:', error)
+      }
     }
 
     // Get OpenAI API key from environment
@@ -93,16 +104,16 @@ serve(async (req) => {
     const imageBytes = await imageFile.arrayBuffer()
     const base64Image = btoa(String.fromCharCode(...new Uint8Array(imageBytes)))
 
-    // Step 3: Analyze image with Vision API and combine with transcription
-    const visionPayload = {
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `I'm sharing a system design diagram I've drawn along with audio commentary. Please analyze both and provide insightful feedback.
+    // Step 3: Create comprehensive evaluation prompt
+    const createEvaluationPrompt = (transcribedText: string, problemContext: {
+      title: string;
+      description: string;
+      content: string;
+      judgementCriteria: string;
+    } | null) => {
+      if (!problemContext) {
+        // Fallback to generic prompt if no problem context
+        return `I'm sharing a system design diagram I've drawn along with audio commentary. Please analyze both and provide insightful feedback.
 
 Audio Commentary: "${transcribedText}"
 
@@ -114,6 +125,91 @@ Please:
 5. Rate the overall design approach (1-10) and explain why
 
 Be specific, helpful, and encouraging in your analysis.`
+      }
+
+      return `You are an expert software architect and senior technical interviewer evaluating a system design solution.
+
+**PROBLEM CONTEXT:**
+Problem: ${problemContext.title}
+Description: ${problemContext.description}
+Requirements: ${problemContext.content}
+Judgment Criteria: ${problemContext.judgementCriteria}
+
+**CANDIDATE SUBMISSION:**
+- Visual Diagram: [Attached image of their system design]
+- Audio Commentary: "${transcribedText}"
+
+**EVALUATION FRAMEWORK:**
+As a senior-level assessment, evaluate the solution across these dimensions:
+
+**1. PROBLEM COMPREHENSION & REQUIREMENTS (20%)**
+- Does the candidate demonstrate clear understanding of the core problem?
+- Have they identified and addressed the key functional requirements?
+- Do they understand the scale, constraints, and business context?
+- Are edge cases and non-functional requirements considered?
+
+**2. SYSTEM ARCHITECTURE & DESIGN (25%)**
+- Is the overall architecture sound and well-structured?
+- Are system boundaries and component responsibilities clearly defined?
+- Does the design follow established architectural patterns appropriately?
+- Is there proper separation of concerns and abstraction layers?
+- How well does the design handle the expected scale and load?
+
+**3. TECHNICAL DEPTH & ACCURACY (20%)**
+- Are the proposed technologies and solutions technically sound?
+- Does the candidate demonstrate deep understanding of chosen components?
+- Are data flows, APIs, and interfaces properly designed?
+- Is the database design appropriate for the use case?
+- Are caching, queuing, and storage strategies well-reasoned?
+
+**4. SCALABILITY & PERFORMANCE (15%)**
+- How does the system handle growth in users, data, and traffic?
+- Are bottlenecks identified and addressed?
+- Are load balancing and distribution strategies appropriate?
+- Does the design support horizontal scaling where needed?
+- Are performance optimization strategies discussed?
+
+**5. RELIABILITY & FAULT TOLERANCE (10%)**
+- Are single points of failure identified and mitigated?
+- Does the design include appropriate redundancy and failover?
+- How does the system handle partial failures and degraded states?
+- Are monitoring, alerting, and observability considered?
+
+**6. COMMUNICATION & REASONING (10%)**
+- How clearly does the candidate explain their design decisions?
+- Do they articulate trade-offs and alternative approaches?
+- Is their reasoning logical and well-structured?
+- Do they demonstrate awareness of complexity and implementation challenges?
+
+**SENIOR-LEVEL EXPECTATIONS:**
+- Deep technical knowledge beyond surface-level solutions
+- Proactive identification of potential issues and trade-offs
+- Consideration of operational, security, and maintenance aspects
+- Ability to reason about system evolution and future requirements
+- Understanding of real-world implementation challenges
+
+**PROVIDE:**
+1. **Overall Assessment**: Score from 1-10 with clear justification
+2. **Strengths**: What the candidate did exceptionally well
+3. **Areas for Improvement**: Specific gaps or weaknesses identified
+4. **Missing Elements**: Critical components or considerations not addressed
+5. **Technical Accuracy**: Correctness of proposed solutions and technologies
+6. **Problem-Specific Evaluation**: How well the solution addresses this particular problem's unique challenges
+7. **Senior-Level Readiness**: Assessment of whether this demonstrates senior-level system design capability
+
+**TONE:** Be constructive but rigorous. This is a senior-level evaluation, so standards should be high. Provide specific, actionable feedback that helps the candidate understand both what they did well and where they can improve.`
+    }
+
+    // Step 4: Analyze image with Vision API and combine with transcription
+    const visionPayload = {
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: createEvaluationPrompt(transcribedText, problemContext)
             },
             {
               type: "image_url",
@@ -124,7 +220,7 @@ Be specific, helpful, and encouraging in your analysis.`
           ]
         }
       ],
-      max_tokens: 1000
+      max_tokens: 2000
     }
 
     const visionResponse = await fetch('https://api.openai.com/v1/chat/completions', {
