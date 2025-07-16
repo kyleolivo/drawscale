@@ -140,78 +140,96 @@ Judgment Criteria: ${problemContext.judgementCriteria}
 - Audio Commentary: "${transcribedText}"
 
 **EVALUATION FRAMEWORK:**
-As a senior-level assessment, evaluate the solution across these dimensions:
+As a senior-level assessment, provide comprehensive analysis across these dimensions:
 
-**1. PROBLEM COMPREHENSION & REQUIREMENTS (15%)**
-- Does the candidate demonstrate clear understanding of the core problem?
-- Have they identified and addressed the key functional requirements?
-- Do they understand the scale, constraints, and business context?
-- Are edge cases and non-functional requirements considered?
+**1. PROBLEM COMPREHENSION & REQUIREMENTS**
+- Assess understanding of the core problem and business context
+- Identify which functional requirements were addressed and which were missed
+- Evaluate consideration of scale, constraints, and edge cases
+- Detail any non-functional requirements that should have been considered
 
-**2. SYSTEM ARCHITECTURE & DESIGN (20%)**
-- Is the overall architecture sound and well-structured?
-- Are system boundaries and component responsibilities clearly defined?
-- Does the design follow established architectural patterns appropriately?
-- Is there proper separation of concerns and abstraction layers?
-- How well does the design handle the expected scale and load?
+**2. SYSTEM ARCHITECTURE & DESIGN**
+- Analyze the overall architecture structure and soundness
+- Examine system boundaries and component responsibilities
+- Review adherence to established architectural patterns
+- Assess separation of concerns and abstraction layers
+- Evaluate how well the design handles expected scale and load
 
-**3. TECHNICAL DEPTH & ACCURACY (15%)**
-- Are the proposed technologies and solutions technically sound?
-- Does the candidate demonstrate deep understanding of chosen components?
-- Are data flows, APIs, and interfaces properly designed?
-- Is the database design appropriate for the use case?
-- Are caching, queuing, and storage strategies well-reasoned?
+**3. TECHNICAL DEPTH & ACCURACY**
+- Review technical soundness of proposed solutions
+- Assess depth of understanding of chosen components
+- Analyze data flows, APIs, and interface designs
+- Evaluate database design appropriateness
+- Review caching, queuing, and storage strategies
 
-**4. SCALABILITY & PERFORMANCE (15%)**
-- How does the system handle growth in users, data, and traffic?
-- Are bottlenecks identified and addressed?
-- Are load balancing and distribution strategies appropriate?
-- Does the design support horizontal scaling where needed?
-- Are performance optimization strategies discussed?
+**4. SCALABILITY & PERFORMANCE**
+- Examine growth handling capabilities for users, data, and traffic
+- Identify bottlenecks and their mitigation strategies
+- Assess load balancing and distribution approaches
+- Review horizontal scaling considerations
+- Analyze performance optimization strategies
 
-**5. COMMENTARY-DESIGN ALIGNMENT (15%)**
-- Does the verbal commentary comprehensively describe what is shown in the visual diagram?
-- Are all major components, connections, and data flows mentioned in the audio explanation?
-- Does the candidate walk through the system architecture as depicted in their drawing?
-- Is there consistency between what they drew and what they explain verbally?
-- **CRITICAL**: If commentary is superficial, incomplete, or doesn't match the visual design, this significantly impacts the overall score.
+**5. COMMENTARY-DESIGN ALIGNMENT**
+- Evaluate how comprehensively the verbal commentary describes the visual diagram
+- Identify components, connections, and data flows missing from the audio explanation
+- Assess consistency between drawn elements and verbal explanations
+- Analyze whether the candidate walked through their system architecture as depicted
 
-**6. RELIABILITY & FAULT TOLERANCE (10%)**
-- Are single points of failure identified and mitigated?
-- Does the design include appropriate redundancy and failover?
-- How does the system handle partial failures and degraded states?
-- Are monitoring, alerting, and observability considered?
+**6. RELIABILITY & FAULT TOLERANCE**
+- Identify single points of failure and their mitigation strategies
+- Assess redundancy and failover mechanisms
+- Review handling of partial failures and degraded states
+- Evaluate monitoring, alerting, and observability considerations
 
-**7. COMMUNICATION & REASONING (10%)**
-- How clearly does the candidate explain their design decisions?
-- Do they articulate trade-offs and alternative approaches?
-- Is their reasoning logical and well-structured?
-- Do they demonstrate awareness of complexity and implementation challenges?
+**7. COMMUNICATION & REASONING**
+- Assess clarity of design decision explanations
+- Review articulation of trade-offs and alternative approaches
+- Evaluate logical structure and reasoning quality
+- Assess awareness of complexity and implementation challenges
 
-**SENIOR-LEVEL EXPECTATIONS:**
-- Deep technical knowledge beyond surface-level solutions
-- Proactive identification of potential issues and trade-offs
-- Consideration of operational, security, and maintenance aspects
-- Ability to reason about system evolution and future requirements
-- Understanding of real-world implementation challenges
-- **CRITICAL**: Comprehensive verbal explanation that matches and thoroughly describes the visual design
+**ANALYSIS APPROACH:**
+For each dimension, provide thorough analysis that identifies both strengths and gaps. When elements are missing or inadequately addressed, explain in detail:
+- What specifically should have been included
+- Why these elements are important for this type of system
+- How their absence impacts the overall design
+- Concrete examples of what a senior-level approach would include
 
-**SCORING GUIDANCE:**
-- **Commentary-Design Mismatch Penalty**: If the audio commentary fails to comprehensively describe the visual design or contains significant inconsistencies, cap the overall score at 6/10 regardless of other strengths
-- **Incomplete Commentary Penalty**: If the commentary is superficial and doesn't walk through major system components shown in the diagram, reduce the overall score by 2-3 points
-- **Excellence Bonus**: Award higher scores (8-10) only when commentary demonstrates deep understanding and thoroughly explains all aspects of the visual design
+**DETAILED FEEDBACK AREAS:**
 
-**PROVIDE:**
-1. **Overall Assessment**: Score from 1-10 with clear justification
-2. **Commentary-Design Alignment Analysis**: Specific assessment of how well the verbal explanation matches and describes the visual design
-3. **Strengths**: What the candidate did exceptionally well
-4. **Areas for Improvement**: Specific gaps or weaknesses identified
-5. **Missing Elements**: Critical components or considerations not addressed
-6. **Technical Accuracy**: Correctness of proposed solutions and technologies
-7. **Problem-Specific Evaluation**: How well the solution addresses this particular problem's unique challenges
-8. **Senior-Level Readiness**: Assessment of whether this demonstrates senior-level system design capability
+**1. VISUAL DESIGN ANALYSIS**
+- Comprehensively describe what is shown in the diagram
+- Identify all components, connections, and data flows depicted
+- Note any missing critical components that should be present
+- Assess the clarity and completeness of the visual representation
 
-**TONE:** Be constructive but rigorous. This is a senior-level evaluation, so standards should be high. Pay special attention to the alignment between visual and verbal components - this is a critical indicator of the candidate's understanding and communication skills. Provide specific, actionable feedback that helps the candidate understand both what they did well and where they can improve.`
+**2. COMMENTARY COMPLETENESS ASSESSMENT**
+- Compare the verbal explanation against the visual elements
+- Identify specific diagram components not mentioned in the audio
+- Highlight inconsistencies between visual and verbal descriptions
+- Assess the depth and technical accuracy of the explanations provided
+
+**3. MISSING CRITICAL ELEMENTS**
+For each missing element, provide detailed explanation including:
+- **What was missed**: Specific component, pattern, or consideration
+- **Why it matters**: Technical and business importance
+- **Impact of omission**: How this affects system reliability, scalability, or functionality
+- **Senior-level expectation**: What a experienced architect would have included
+- **Implementation guidance**: Concrete suggestions for addressing the gap
+
+**4. TECHNICAL DEPTH ANALYSIS**
+- Evaluate the sophistication of proposed solutions
+- Identify areas where deeper technical understanding should be demonstrated
+- Highlight opportunities for more advanced architectural patterns
+- Assess consideration of real-world implementation challenges
+
+**5. PROBLEM-SPECIFIC EVALUATION**
+- Analyze how well the solution addresses the unique challenges of this specific problem
+- Identify domain-specific considerations that were missed
+- Evaluate understanding of the business context and user needs
+- Assess scalability requirements specific to this use case
+
+**RESPONSE FORMAT:**
+Provide a comprehensive analysis that serves as both evaluation and learning opportunity. Focus on detailed explanations that help the candidate understand not just what was missing, but why it matters and how to improve. Use specific examples and technical details to illustrate points.`
     }
 
     // Step 4: Analyze image with Vision API and combine with transcription
