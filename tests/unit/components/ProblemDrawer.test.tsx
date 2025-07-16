@@ -33,4 +33,54 @@ describe('ProblemDrawer', () => {
     );
     expect(screen.getByText('Choose a System Design Problem')).toBeInTheDocument();
   });
+
+  it('shows processing indicator when isProcessingSubmission is true', () => {
+    const { container } = render(
+      <ProblemDrawer
+        {...baseProps}
+        isProcessingSubmission={true}
+      />
+    );
+
+    expect(container.querySelector('.processing-indicator')).toBeInTheDocument();
+    expect(screen.getByText('Analyzing your design solution...')).toBeInTheDocument();
+    expect(screen.getByText('Analyzing your design and commentary...')).toBeInTheDocument();
+  });
+
+  it('hides processing indicator when isProcessingSubmission is false', () => {
+    const { container } = render(
+      <ProblemDrawer
+        {...baseProps}
+        isProcessingSubmission={false}
+      />
+    );
+
+    expect(container.querySelector('.processing-indicator')).not.toBeInTheDocument();
+  });
+
+  it('shows processing indicator above other content', () => {
+    const { container } = render(
+      <ProblemDrawer
+        {...baseProps}
+        isProcessingSubmission={true}
+      />
+    );
+
+    const drawerContent = container.querySelector('.drawer-content');
+    const processingIndicator = container.querySelector('.processing-indicator');
+    const problemRenderer = container.querySelector('.problem-renderer');
+
+    expect(drawerContent).toBeInTheDocument();
+    expect(processingIndicator).toBeInTheDocument();
+    expect(problemRenderer).toBeInTheDocument();
+
+    // Processing indicator should appear before problem renderer in DOM order
+    expect(drawerContent?.children[0]).toBe(processingIndicator);
+  });
+
+  it('defaults to not showing processing indicator when prop is undefined', () => {
+    const { container } = render(<ProblemDrawer {...baseProps} />);
+
+    expect(container.querySelector('.processing-indicator')).not.toBeInTheDocument();
+  });
 }); 

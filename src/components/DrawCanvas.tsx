@@ -23,6 +23,7 @@ function DrawCanvas(): JSX.Element {
     currentState: ApplicationState.PROBLEMS_DIRECTORY,
     currentProblem: DEFAULT_PROBLEM
   });
+  const [isProcessingSubmission, setIsProcessingSubmission] = useState(false);
   const isInitializing = useRef(true);
 
   const handleDrawerToggle = () => {
@@ -121,12 +122,15 @@ function DrawCanvas(): JSX.Element {
 
   const handleTranscriptionSubmit = async (audioBlob: Blob) => {
     try {
+      setIsProcessingSubmission(true);
+      
       // Capture the current canvas image
       const imageBlob = await captureCanvasImage();
       
       if (!imageBlob) {
         console.error('Canvas capture failed - unable to process recording');
         alert('Unable to capture canvas image. Please try recording again.');
+        setIsProcessingSubmission(false);
         return;
       }
 
@@ -158,6 +162,8 @@ function DrawCanvas(): JSX.Element {
     } catch (error) {
       console.error('Transcription error:', error);
       alert('Failed to process audio and image. Please try again.');
+    } finally {
+      setIsProcessingSubmission(false);
     }
   };
 
@@ -759,6 +765,7 @@ function DrawCanvas(): JSX.Element {
           onSignOut={signOut}
           onProblemSelect={handleProblemSelect}
           onBackToProblems={handleBackToProblems}
+          isProcessingSubmission={isProcessingSubmission}
           style={{ width: isDrawerOpen ? `${drawerWidth}px` : '20px' }}
         />
         <DrawerToggle

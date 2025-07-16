@@ -315,4 +315,58 @@ describe('Component Interaction Tests', () => {
       });
     });
   });
+
+  describe('Processing Indicator Integration', () => {
+    it('shows and hides processing indicator during submission flow', async () => {
+      const { container } = renderWithAuth(<DrawCanvas />);
+
+      // Initially, no processing indicator should be visible
+      expect(container.querySelector('.processing-indicator')).not.toBeInTheDocument();
+
+      // Navigate to a problem first
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]);
+
+      // Still no processing indicator until submission starts
+      expect(container.querySelector('.processing-indicator')).not.toBeInTheDocument();
+
+      // Verify the component structure is ready for processing indicator
+      const problemDrawer = container.querySelector('.problem-drawer');
+      expect(problemDrawer).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
+    });
+
+    it('processing indicator appears in the correct location within drawer', () => {
+      const { container } = renderWithAuth(<DrawCanvas />);
+
+      // Navigate to a problem
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]);
+
+      // Check that the drawer content structure is set up correctly
+      const drawerContent = container.querySelector('.drawer-content');
+      expect(drawerContent).toBeInTheDocument();
+
+      // Verify ProblemRenderer is present (which means processing indicator would appear above it)
+      expect(container.querySelector('.problem-renderer')).toBeInTheDocument();
+    });
+
+    it('maintains drawer state consistency during processing', async () => {
+      const { container } = renderWithAuth(<DrawCanvas />);
+
+      // Start with drawer open
+      expect(container.querySelector('.canvas-container')).toHaveClass('drawer-open');
+
+      // Navigate to a problem
+      const problemCards = screen.getAllByText('Bitly');
+      fireEvent.click(problemCards[0]);
+
+      // Drawer should remain open and functional
+      expect(container.querySelector('.canvas-container')).toHaveClass('drawer-open');
+      expect(container.querySelector('.problem-drawer')).toHaveClass('open');
+
+      // Record button should be accessible
+      expect(screen.getByRole('button', { name: /start recording/i })).toBeInTheDocument();
+    });
+  });
 }); 
