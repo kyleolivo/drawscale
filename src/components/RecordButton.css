@@ -3,6 +3,9 @@
   bottom: 80px;
   right: 80px;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .record-button {
@@ -54,4 +57,16 @@
   50% {
     opacity: 0.6;
   }
+}
+
+.recording-duration {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: monospace;
+  min-width: 60px;
+  text-align: center;
 }
