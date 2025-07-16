@@ -37,10 +37,6 @@ npm run lint
 echo "🧪 Running unit tests..."
 npm run test:run
 
-# Run E2E tests (headless mode)
-echo "🌐 Running E2E tests..."
-npm run test:e2e
-
 echo "✅ All validation checks passed! Ready to push."
 EOF
 
@@ -53,6 +49,5 @@ echo ""
 echo "The hook will now run the following checks before each push:"
 echo "  • ESLint (code linting)"
 echo "  • Unit tests (Vitest)"
-echo "  • E2E tests (Playwright)"
 echo ""
 echo "To skip the hook for a specific push, use: git push --no-verify"

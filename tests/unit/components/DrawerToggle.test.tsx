@@ -171,7 +171,7 @@ describe('DrawerToggle Component', () => {
 
     const path = screen.getByRole('button').querySelector('path');
     expect(path).toBeInTheDocument();
-    expect(path).toHaveAttribute('d', 'M6 12L10 8L6 4');
+    expect(path).toHaveAttribute('d', 'M10 12L6 8L10 4');
     expect(path).toHaveAttribute('stroke', 'currentColor');
     expect(path).toHaveAttribute('stroke-width', '2');
     expect(path).toHaveAttribute('stroke-linecap', 'round');

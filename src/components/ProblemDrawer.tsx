@@ -41,7 +41,7 @@ export const DrawerToggle: React.FC<DrawerToggleProps> = ({
         fill="none"
       >
         <path 
-          d="M6 12L10 8L6 4" 
+          d="M10 12L6 8L10 4" 
           stroke="currentColor" 
           strokeWidth="2" 
           strokeLinecap="round" 
@@ -98,7 +98,7 @@ const ProblemDrawer: React.FC<ProblemDrawerProps & {
         {appState.currentState === ApplicationState.PROBLEMS_DIRECTORY && (
           <ProblemPicker 
             problems={PROBLEMS}
-            onProblemSelect={onProblemSelect}
+            onProblemSelect={onProblemSelect || (() => {})}
           />
         )}
       </div>
