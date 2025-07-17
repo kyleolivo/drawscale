@@ -187,10 +187,7 @@
 
 .analysis-text strong {
   color: #1e293b;
-  font-weight: 600;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  padding: 2px 4px;
-  border-radius: 4px;
+  font-weight: 700;
 }
 
 .analysis-text em {
