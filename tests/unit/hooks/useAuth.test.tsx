@@ -3,6 +3,12 @@ import { renderHook, act } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { AuthProvider, useAuth } from '../../../src/hooks/useAuth'
 
+// Set environment variable for tests
+process.env.VITE_ALLOWED_EMAILS = 'apple@example.com,test@example.com,user@example.com'
+
+// Mock import.meta.env for the tests
+const originalEnv = import.meta.env
+
 // Mock localStorage
 const mockLocalStorage = {
   getItem: vi.fn(),
@@ -18,6 +24,17 @@ describe('useAuth hook', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockLocalStorage.getItem.mockReturnValue(null)
+    
+    // Reset to production mode for each test
+    Object.defineProperty(import.meta, 'env', {
+      value: {
+        ...originalEnv,
+        VITE_ALLOWED_EMAILS: 'apple@example.com,test@example.com,user@example.com',
+        MODE: 'production' // Mock production mode for authorization tests
+      },
+      writable: true,
+      configurable: true
+    })
   })
 
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -84,7 +101,7 @@ describe('useAuth hook', () => {
     consoleSpy.mockRestore()
   })
 
-  it('signs in user with Apple data', () => {
+  it('signs in user with Apple data when email is authorized', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
     
     const appleData = {
@@ -105,6 +122,7 @@ describe('useAuth hook', () => {
       name: 'Apple User'
     })
     expect(result.current.isAuthenticated).toBe(true)
+    expect(result.current.isAuthorized).toBe(true)
     expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
       'drawscale_user',
       JSON.stringify({
@@ -114,23 +132,46 @@ describe('useAuth hook', () => {
       })
     )
   })
+  
+  it('rejects sign in for unauthorized email', () => {
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    
+    const appleData = {
+      authorization: { id_token: 'apple-token-123' },
+      user: {
+        email: 'unauthorized@example.com',
+        name: { firstName: 'Unauthorized', lastName: 'User' }
+      }
+    }
+    
+    expect(() => {
+      act(() => {
+        result.current.signIn(appleData)
+      })
+    }).toThrow('Access denied: Your email is not authorized to use this service.')
+    
+    expect(result.current.user).toBe(null)
+    expect(result.current.isAuthenticated).toBe(false)
+    expect(result.current.isAuthorized).toBe(false)
+    expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('drawscale_user')
+  })
 
-  it('handles sign in with minimal data', () => {
+  it('handles sign in with minimal data (no email)', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
     
     const minimalData = {
       user: 'user-string-id'
     }
     
-    act(() => {
-      result.current.signIn(minimalData)
-    })
+    expect(() => {
+      act(() => {
+        result.current.signIn(minimalData)
+      })
+    }).toThrow('Access denied: Your email is not authorized to use this service.')
     
-    expect(result.current.user).toEqual({
-      id: 'user-string-id',
-      email: undefined,
-      name: undefined
-    })
+    expect(result.current.user).toBe(null)
+    expect(result.current.isAuthenticated).toBe(false)
+    expect(result.current.isAuthorized).toBe(false)
   })
 
   it('signs out user', () => {
@@ -145,6 +186,7 @@ describe('useAuth hook', () => {
     })
     
     expect(result.current.isAuthenticated).toBe(true)
+    expect(result.current.isAuthorized).toBe(true)
     
     // Then sign out
     act(() => {
@@ -153,6 +195,8 @@ describe('useAuth hook', () => {
     
     expect(result.current.user).toBeNull()
     expect(result.current.isAuthenticated).toBe(false)
+    expect(result.current.isAuthorized).toBe(false)
     expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('drawscale_user')
   })
+
 })

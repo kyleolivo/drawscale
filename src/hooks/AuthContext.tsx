@@ -25,10 +25,24 @@ interface AuthContextType {
   signIn: (userData: AppleSignInData) => void;
   signOut: () => void;
   isAuthenticated: boolean;
+  isAuthorized: boolean;
   isLoading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper function to check if email is in whitelist
+const isEmailAuthorized = (email?: string): boolean => {
+  // In development mode, allow any email
+  if (import.meta.env.MODE === 'development') {
+    return true;
+  }
+  
+  if (!email) return false;
+  
+  const allowedEmails = import.meta.env.VITE_ALLOWED_EMAILS?.split(',') || [];
+  return allowedEmails.map((e: string) => e.trim().toLowerCase()).includes(email.toLowerCase());
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -56,8 +70,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         `${userData.user.name.firstName || ''} ${userData.user.name.lastName || ''}`.trim() : undefined
     };
     
-    setUser(user);
-    localStorage.setItem('drawscale_user', JSON.stringify(user));
+    // Only set user if they're authorized
+    if (isEmailAuthorized(user.email)) {
+      setUser(user);
+      localStorage.setItem('drawscale_user', JSON.stringify(user));
+    } else {
+      // Clear any existing auth data for unauthorized users
+      setUser(null);
+      localStorage.removeItem('drawscale_user');
+      throw new Error('Access denied: Your email is not authorized to use this service.');
+    }
   };
 
   const signOut = () => {
@@ -70,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signIn,
     signOut,
     isAuthenticated: !!user,
+    isAuthorized: !!user && isEmailAuthorized(user.email),
     isLoading
   };
 

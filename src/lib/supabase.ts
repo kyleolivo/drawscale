@@ -50,6 +50,7 @@ export async function transcribeAudio(audioBlob: Blob): Promise<{ text: string }
 export async function transcribeAudioWithImage(
   audioBlob: Blob, 
   imageBlob: Blob,
+  userEmail: string,
   problemContext?: {
     title: string;
     description: string;
@@ -68,6 +69,7 @@ export async function transcribeAudioWithImage(
   const formData = new FormData()
   formData.append('audio', audioBlob, 'recording.webm')
   formData.append('image', imageBlob, 'canvas.png')
+  formData.append('userEmail', userEmail)
   
   // Add problem context if provided
   if (problemContext) {

@@ -23,10 +23,11 @@ serve(async (req) => {
       )
     }
 
-    // Get the audio, image files, and problem context from the form data
+    // Get the audio, image files, user email, and problem context from the form data
     const formData = await req.formData()
     const audioFile = formData.get('audio') as File
     const imageFile = formData.get('image') as File
+    const userEmail = formData.get('userEmail') as string
     const problemContextJson = formData.get('problemContext') as string
 
     if (!audioFile || !imageFile) {
@@ -37,6 +38,33 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
+    }
+
+    // Check if user email is authorized
+    if (!userEmail) {
+      return new Response(
+        JSON.stringify({ error: 'User email is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    // Check if we're in development mode (skip authorization for dev)
+    const isProduction = Deno.env.get('ENVIRONMENT') === 'production' || Deno.env.get('NODE_ENV') === 'production';
+    
+    if (isProduction) {
+      const allowedEmails = Deno.env.get('ALLOWED_EMAILS')?.split(',').map(e => e.trim().toLowerCase()) || [];
+      if (!allowedEmails.includes(userEmail.toLowerCase())) {
+        return new Response(
+          JSON.stringify({ error: 'Access denied: Your email is not authorized to use this service.' }),
+          { 
+            status: 403, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
     }
 
     // Parse problem context (required)

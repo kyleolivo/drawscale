@@ -143,7 +143,12 @@ function DrawCanvas(): JSX.Element {
         judgementCriteria: appState.currentProblem.judgementCriteria
       };
       
-      const result = await transcribeAudioWithImage(audioBlob, imageBlob, problemContext);
+      const userEmail = user?.email;
+      if (!userEmail) {
+        throw new Error('User email is required for analysis');
+      }
+      
+      const result = await transcribeAudioWithImage(audioBlob, imageBlob, userEmail, problemContext);
       
       // Update the app state with the analysis result
       setAppState(prevState => ({
