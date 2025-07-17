@@ -45,9 +45,9 @@ const ProblemAnalysis: React.FC<ProblemAnalysisProps> = ({
             <h4>Your Commentary</h4>
           </div>
           <div className="transcription-content">
-            <div className="quote-mark">"</div>
+            <div className="quote-mark">&ldquo;</div>
             <p className="transcription-text">{analysisResult.transcription}</p>
-            <div className="quote-mark closing">"</div>
+            <div className="quote-mark closing">&rdquo;</div>
           </div>
         </div>
         

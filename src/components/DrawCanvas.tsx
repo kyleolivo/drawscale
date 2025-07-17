@@ -15,7 +15,7 @@ import './DrawCanvas.css';
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-  const [drawerWidth, setDrawerWidth] = useState(() => Math.min(600, window.innerWidth * 0.6));
+  const [drawerWidth, setDrawerWidth] = useState(() => Math.min(700, window.innerWidth * 0.65));
   const [isResizing, setIsResizing] = useState(false);
   const [excalidrawElements, setExcalidrawElements] = useState<readonly ExcalidrawElement[]>([]);
   const [excalidrawAppState, setExcalidrawAppState] = useState<AppState | null>(null);

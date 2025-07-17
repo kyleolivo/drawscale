@@ -4,7 +4,7 @@
   height: 100vh;
   width: 100%;
   position: relative;
-  --drawer-width: 350px;
+  --drawer-width: 420px;
 }
 
 .canvas-container.drawer-closed {
