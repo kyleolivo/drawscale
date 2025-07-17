@@ -773,7 +773,10 @@ function DrawCanvas(): JSX.Element {
           onToggle={handleDrawerToggle}
           isMobile={false}
         />
-        <RecordButton onTranscriptionSubmit={handleTranscriptionSubmit} />
+        <RecordButton 
+          onTranscriptionSubmit={handleTranscriptionSubmit} 
+          disabled={appState.currentState !== ApplicationState.PROBLEM_PRESENTATION}
+        />
       </div>
     </div>
   );

@@ -3,9 +3,10 @@ import './RecordButton.css';
 
 interface RecordButtonProps {
   onTranscriptionSubmit: (audioBlob: Blob) => void;
+  disabled?: boolean;
 }
 
-function RecordButton({ onTranscriptionSubmit }: RecordButtonProps): JSX.Element {
+function RecordButton({ onTranscriptionSubmit, disabled = false }: RecordButtonProps): JSX.Element {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -102,9 +103,11 @@ function RecordButton({ onTranscriptionSubmit }: RecordButtonProps): JSX.Element
   return (
     <div className="record-button-container">
       <button
-        className={`record-button ${isRecording ? 'recording' : ''}`}
+        className={`record-button ${isRecording ? 'recording' : ''} ${disabled ? 'disabled' : ''}`}
         onClick={handleRecordClick}
-        aria-label={isRecording ? 'Stop recording' : 'Start recording'}
+        aria-label={disabled ? 'Select a problem to enable recording' : (isRecording ? 'Stop recording' : 'Start recording')}
+        title={disabled ? 'Select a problem to enable recording' : ''}
+        disabled={disabled}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />

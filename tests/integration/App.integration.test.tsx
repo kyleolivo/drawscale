@@ -106,8 +106,8 @@ describe('App Integration Tests', () => {
     const recordButton = document.querySelector('.record-button-container')
     expect(recordButton).toBeInTheDocument()
     
-    // Check that the record button itself is present
-    const button = screen.getByRole('button', { name: /start recording/i })
+    // Check that the record button is present but disabled (no problem selected)
+    const button = screen.getByRole('button', { name: /select a problem to enable recording/i })
     expect(button).toBeInTheDocument()
     expect(button).toHaveClass('record-button')
   })
@@ -125,8 +125,10 @@ describe('App Integration Tests', () => {
       render(<App />)
     });
     
-    const recordButton = screen.getByRole('button', { name: /start recording/i })
+    // The record button should be disabled initially (no problem selected)
+    const recordButton = screen.getByRole('button', { name: /select a problem to enable recording/i })
     expect(recordButton).toBeInTheDocument()
+    expect(recordButton).toBeDisabled()
     
     // The button should be integrated into the DrawCanvas component
     const drawCanvas = document.querySelector('.App')

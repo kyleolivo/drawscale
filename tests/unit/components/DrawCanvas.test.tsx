@@ -274,9 +274,10 @@ describe('DrawCanvas Component', () => {
 
       const { container } = render(<DrawCanvas />)
       
-      // Get the RecordButton component and simulate transcription submission
-      const recordButton = screen.getByRole('button', { name: /start recording/i })
-      expect(recordButton).toBeInTheDocument()
+      // First, the record button should be disabled (no problem selected)
+      const disabledButton = screen.getByRole('button', { name: /select a problem to enable recording/i })
+      expect(disabledButton).toBeInTheDocument()
+      expect(disabledButton).toBeDisabled()
 
       // Since we can't easily test the actual recording flow, we'll test the component
       // structure to ensure it's set up to pass the processing state correctly
