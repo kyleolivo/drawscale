@@ -39,4 +39,24 @@ describe('ProcessingIndicator', () => {
     expect(container.querySelector('.processing-message')).toBeInTheDocument();
     expect(container.querySelector('.processing-details')).toBeInTheDocument();
   });
+
+  it('renders compact variant correctly', () => {
+    const { container } = render(<ProcessingIndicator variant="compact" />);
+    
+    expect(container.querySelector('.processing-indicator-compact')).toBeInTheDocument();
+    expect(container.querySelector('.processing-spinner-compact')).toBeInTheDocument();
+    expect(container.querySelector('.spinner-ring-compact')).toBeInTheDocument();
+    expect(container.querySelector('.processing-text-compact')).toBeInTheDocument();
+    expect(screen.getByText('Processing...')).toBeInTheDocument();
+    
+    // Should not have full variant classes
+    expect(container.querySelector('.processing-indicator')).not.toBeInTheDocument();
+  });
+
+  it('compact variant has correct number of spinner elements', () => {
+    const { container } = render(<ProcessingIndicator variant="compact" />);
+    
+    const spinnerDivs = container.querySelectorAll('.spinner-ring-compact div');
+    expect(spinnerDivs).toHaveLength(4);
+  });
 });

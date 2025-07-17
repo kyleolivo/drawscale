@@ -4,6 +4,7 @@ import type { ExcalidrawElement, AppState, BinaryFiles } from "@excalidraw/excal
 import { useAuth } from '../hooks/useAuth';
 import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
 import RecordButton from './RecordButton';
+import ProcessingIndicator from './ProcessingIndicator';
 import { DEFAULT_PROBLEM } from '../constants/problems';
 import { transcribeAudioWithImage } from '../lib/supabase';
 
@@ -765,7 +766,6 @@ function DrawCanvas(): JSX.Element {
           onSignOut={signOut}
           onProblemSelect={handleProblemSelect}
           onBackToProblems={handleBackToProblems}
-          isProcessingSubmission={isProcessingSubmission}
           style={{ width: isDrawerOpen ? `${drawerWidth}px` : '20px' }}
         />
         <DrawerToggle
@@ -777,6 +777,11 @@ function DrawCanvas(): JSX.Element {
           onTranscriptionSubmit={handleTranscriptionSubmit} 
           disabled={appState.currentState !== ApplicationState.PROBLEM_PRESENTATION}
         />
+        
+        {/* Show compact processing indicator when processing submission */}
+        {isProcessingSubmission && (
+          <ProcessingIndicator variant="compact" />
+        )}
       </div>
     </div>
   );

@@ -279,6 +279,9 @@ describe('DrawCanvas Component', () => {
       expect(disabledButton).toBeInTheDocument()
       expect(disabledButton).toBeDisabled()
 
+      // Processing indicator should not be visible initially
+      expect(container.querySelector('.processing-indicator-compact')).not.toBeInTheDocument()
+
       // Since we can't easily test the actual recording flow, we'll test the component
       // structure to ensure it's set up to pass the processing state correctly
       const problemDrawer = container.querySelector('.problem-drawer')

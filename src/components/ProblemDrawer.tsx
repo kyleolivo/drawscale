@@ -5,7 +5,6 @@ import ProblemRenderer from './ProblemRenderer';
 import ProblemAnalysis from './ProblemAnalysis';
 import ProblemPicker from './ProblemPicker';
 import AppHeader from './AppHeader';
-import ProcessingIndicator from './ProcessingIndicator';
 import { PROBLEMS } from '../constants/problems';
 import './ProblemDrawer.css';
 
@@ -55,7 +54,6 @@ export const DrawerToggle: React.FC<DrawerToggleProps> = ({
 const ProblemDrawer: React.FC<ProblemDrawerProps & { 
   style?: React.CSSProperties; 
   onBackToProblems?: () => void;
-  isProcessingSubmission?: boolean;
 }> = ({
   appState,
   isOpen = true,
@@ -63,7 +61,6 @@ const ProblemDrawer: React.FC<ProblemDrawerProps & {
   onSignOut,
   onProblemSelect,
   onBackToProblems,
-  isProcessingSubmission = false,
   style
 }) => {
   return (
@@ -78,10 +75,6 @@ const ProblemDrawer: React.FC<ProblemDrawerProps & {
       </div>
       
       <div className="drawer-content">
-        {/* Show processing indicator when submission is being processed */}
-        {isProcessingSubmission && (
-          <ProcessingIndicator message="Analyzing your design solution..." />
-        )}
         
         {appState.currentState === ApplicationState.PROBLEM_PRESENTATION && (
           <>
