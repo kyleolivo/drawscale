@@ -23,9 +23,9 @@ describe('ProblemAnalysis', () => {
       />
     );
 
-    expect(screen.getByText('🎙️ AI Analysis')).toBeInTheDocument();
-    expect(screen.getByText('📝 Your Commentary:')).toBeInTheDocument();
-    expect(screen.getByText('🤖 AI Feedback:')).toBeInTheDocument();
+    expect(screen.getByText('Analysis Complete')).toBeInTheDocument();
+    expect(screen.getByText('Your Commentary')).toBeInTheDocument();
+    expect(screen.getByText('AI Feedback')).toBeInTheDocument();
   });
 
   it('displays transcription text with proper formatting', () => {
@@ -97,7 +97,7 @@ describe('ProblemAnalysis', () => {
     expect(analysisHeader).toBeInTheDocument();
     
     // Should contain both the title and timestamp
-    expect(analysisHeader).toContainElement(screen.getByText('🎙️ AI Analysis'));
+    expect(analysisHeader).toContainElement(screen.getByText('Analysis Complete'));
     expect(analysisHeader).toContainElement(screen.getByText(mockAnalysisResult.timestamp.toLocaleTimeString()));
   });
 
@@ -113,7 +113,7 @@ describe('ProblemAnalysis', () => {
       />
     );
 
-    expect(screen.getByText('📝 Your Commentary:')).toBeInTheDocument();
+    expect(screen.getByText('Your Commentary')).toBeInTheDocument();
     
     // Check that the transcription section exists even with empty content
     const transcriptionSection = document.querySelector('.transcription-text');
@@ -132,9 +132,9 @@ describe('ProblemAnalysis', () => {
       />
     );
 
-    expect(screen.getByText('🤖 AI Feedback:')).toBeInTheDocument();
+    expect(screen.getByText('AI Feedback')).toBeInTheDocument();
     // Empty analysis should still render the section
-    const analysisSection = screen.getByText('🤖 AI Feedback:').closest('.ai-analysis-section');
+    const analysisSection = screen.getByText('AI Feedback').closest('.ai-analysis-section');
     expect(analysisSection).toBeInTheDocument();
   });
 
@@ -172,6 +172,8 @@ describe('ProblemAnalysis', () => {
 
     const transcriptionText = document.querySelector('.transcription-text');
     expect(transcriptionText).toHaveTextContent(mockAnalysisResult.transcription);
-    expect(transcriptionText?.textContent).toMatch(/[“”].*[“”]/); // Check for curly quotes
+    // Check that quote marks are present as decorative elements
+    const quoteMarks = document.querySelectorAll('.quote-mark');
+    expect(quoteMarks).toHaveLength(2);
   });
 }); 
