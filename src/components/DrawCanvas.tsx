@@ -41,7 +41,7 @@ function DrawCanvas(): JSX.Element {
     
     const newWidth = window.innerWidth - e.clientX;
     const minWidth = 250;
-    const maxWidth = Math.min(600, window.innerWidth * 0.6);
+    const maxWidth = Math.min(700, window.innerWidth * 0.65);
     
     setDrawerWidth(Math.max(minWidth, Math.min(maxWidth, newWidth)));
   }, [isResizing]);
