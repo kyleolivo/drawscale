@@ -257,8 +257,5 @@ export const PROBLEMS: SystemDesignProblem[] = [
   PARKING_GARAGE_VALET,
   
   // Hard
-  BITLY_PROBLEM,
   CHAT_APPLICATION,
-  VIDEO_STREAMING,
-  RIDE_SHARING,
 ]

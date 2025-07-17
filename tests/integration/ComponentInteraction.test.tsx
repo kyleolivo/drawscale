@@ -62,7 +62,7 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Check that both components are rendered
-      const headings = screen.getAllByText('Bitly');
+      const headings = screen.getAllByText('Blog Platform');
       expect(headings.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
@@ -142,13 +142,13 @@ describe('Component Interaction Tests', () => {
     it('passes correct props from DrawCanvas to ProblemDrawer', () => {
       renderWithAuth(<DrawCanvas />);
 
-      // Check that ProblemDrawer receives the default problem
-      const headings = screen.getAllByText('Bitly');
+      // Check that ProblemDrawer receives the default problem (Blog Platform)
+      const headings = screen.getAllByText('Blog Platform');
       expect(headings.length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('URL shortening service that converts long URLs into short, shareable links.')).toBeInTheDocument();
-      // Check for Medium difficulty badges - there should be multiple since both problems are Medium
-      const mediumBadges = screen.getAllByText('Medium');
-      expect(mediumBadges.length).toBeGreaterThanOrEqual(1);
+      expect(screen.getByText('Simple blogging platform where users create accounts and publish articles.')).toBeInTheDocument();
+      // Check for Easy difficulty badge
+      const easyBadge = screen.getByText('Easy');
+      expect(easyBadge).toBeInTheDocument();
     });
 
     it('passes correct props from DrawCanvas to DrawerToggle', () => {
@@ -194,7 +194,7 @@ describe('Component Interaction Tests', () => {
       expect(screen.getByText('TU')).toBeInTheDocument(); // Test User initials
 
       // Check that drawing components are also present
-      const headings = screen.getAllByText('Bitly');
+      const headings = screen.getAllByText('Blog Platform');
       expect(headings.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByTestId('excalidraw-component')).toBeInTheDocument();
     });
@@ -228,7 +228,7 @@ describe('Component Interaction Tests', () => {
       expect(screen.queryByLabelText('Back to problems list')).not.toBeInTheDocument();
 
       // Click on a problem to view it
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]); // Click the first problem card
 
       // Now we should see the back button in the header
@@ -239,7 +239,7 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Click on a problem to view it
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]);
 
       // Verify we're viewing the problem (back button should be visible)
@@ -266,7 +266,7 @@ describe('Component Interaction Tests', () => {
       expect(container.querySelector('.problem-picker')).toBeInTheDocument();
 
       // Navigate to a problem
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]);
 
       // Should show problem renderer instead of picker
@@ -290,7 +290,7 @@ describe('Component Interaction Tests', () => {
       renderWithAuth(<DrawCanvas />);
 
       // Navigate to a problem
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]);
 
       // Verify back button is present
@@ -324,7 +324,7 @@ describe('Component Interaction Tests', () => {
       expect(container.querySelector('.processing-indicator')).not.toBeInTheDocument();
 
       // Navigate to a problem first
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]);
 
       // Still no processing indicator until submission starts
@@ -340,7 +340,7 @@ describe('Component Interaction Tests', () => {
       const { container } = renderWithAuth(<DrawCanvas />);
 
       // Navigate to a problem
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]);
 
       // Check that the drawer content structure is set up correctly
@@ -358,7 +358,7 @@ describe('Component Interaction Tests', () => {
       expect(container.querySelector('.canvas-container')).toHaveClass('drawer-open');
 
       // Navigate to a problem
-      const problemCards = screen.getAllByText('Bitly');
+      const problemCards = screen.getAllByText('Blog Platform');
       fireEvent.click(problemCards[0]);
 
       // Drawer should remain open and functional

@@ -22,11 +22,8 @@ describe('ProblemPicker', () => {
 
     expect(screen.getByText('Choose a System Design Problem')).toBeInTheDocument();
     expect(screen.getByText('Blog Platform')).toBeInTheDocument();
-    expect(screen.getByText('Bitly')).toBeInTheDocument();
     expect(screen.getByText('Parking Garage Valet')).toBeInTheDocument();
     expect(screen.getByText('WhatsApp')).toBeInTheDocument();
-    expect(screen.getByText('YouTube')).toBeInTheDocument();
-    expect(screen.getByText('Uber')).toBeInTheDocument();
   });
 
   it('displays problem information correctly', () => {
@@ -39,20 +36,18 @@ describe('ProblemPicker', () => {
 
     // Check for problem titles
     expect(screen.getByText('Blog Platform')).toBeInTheDocument();
-    expect(screen.getByText('Bitly')).toBeInTheDocument();
     expect(screen.getByText('Parking Garage Valet')).toBeInTheDocument();
+    expect(screen.getByText('WhatsApp')).toBeInTheDocument();
 
     // Check for problem descriptions
     expect(screen.getByText('Simple blogging platform where users create accounts and publish articles.')).toBeInTheDocument();
-    expect(screen.getByText('URL shortening service that converts long URLs into short, shareable links.')).toBeInTheDocument();
     expect(screen.getByText('Smart parking system that manages valet operations and customer experience.')).toBeInTheDocument();
+    expect(screen.getByText('Real-time messaging app supporting one-on-one and group conversations.')).toBeInTheDocument();
 
-    // Check for difficulty badges (we now have Easy, Medium, and Hard difficulties)
+    // Check for difficulty badges (we now have one of each difficulty)
     expect(screen.getByText('Easy')).toBeInTheDocument();
-    const mediumBadges = screen.getAllByText('Medium');
-    expect(mediumBadges.length).toBeGreaterThanOrEqual(1);
-    const hardBadges = screen.getAllByText('Hard');
-    expect(hardBadges.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Medium')).toBeInTheDocument();
+    expect(screen.getByText('Hard')).toBeInTheDocument();
   });
 
   it('calls onProblemSelect when a problem card is clicked', () => {
