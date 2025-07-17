@@ -34,14 +34,32 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 // Helper function to check if email is in whitelist
 const isEmailAuthorized = (email?: string): boolean => {
   // In development mode, allow any email
-  if (import.meta.env.MODE === 'development') {
+  // Only consider it development if explicitly set to development mode
+  const isDev = import.meta.env.MODE === 'development';
+  
+  if (isDev) {
+    console.log('Development mode detected, allowing any email');
     return true;
   }
   
-  if (!email) return false;
+  if (!email) {
+    console.log('No email provided for authorization check');
+    return false;
+  }
   
   const allowedEmails = import.meta.env.VITE_ALLOWED_EMAILS?.split(',') || [];
-  return allowedEmails.map((e: string) => e.trim().toLowerCase()).includes(email.toLowerCase());
+  const isAuthorized = allowedEmails.map((e: string) => e.trim().toLowerCase()).includes(email.toLowerCase());
+  
+  console.log('Production mode authorization check:', {
+    email,
+    allowedEmails,
+    isAuthorized,
+    envMode: import.meta.env.MODE,
+    envProd: import.meta.env.PROD,
+    envDev: import.meta.env.DEV
+  });
+  
+  return isAuthorized;
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

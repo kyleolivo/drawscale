@@ -25,12 +25,17 @@ describe('useAuth hook', () => {
     vi.clearAllMocks()
     mockLocalStorage.getItem.mockReturnValue(null)
     
+    // Mock console.log to avoid spam in tests
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    
     // Reset to production mode for each test
     Object.defineProperty(import.meta, 'env', {
       value: {
         ...originalEnv,
         VITE_ALLOWED_EMAILS: 'apple@example.com,test@example.com,user@example.com',
-        MODE: 'production' // Mock production mode for authorization tests
+        MODE: 'production', // Mock production mode for authorization tests
+        PROD: true,
+        DEV: false
       },
       writable: true,
       configurable: true
