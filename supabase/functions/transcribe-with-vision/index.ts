@@ -39,14 +39,31 @@ serve(async (req) => {
       )
     }
 
-    // Parse problem context if provided
-    let problemContext = null
-    if (problemContextJson) {
-      try {
-        problemContext = JSON.parse(problemContextJson)
-      } catch (error) {
-        console.warn('Failed to parse problem context:', error)
-      }
+    // Parse problem context (required)
+    if (!problemContextJson) {
+      return new Response(
+        JSON.stringify({ error: 'Problem context is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    let problemContext
+    try {
+      problemContext = JSON.parse(problemContextJson)
+    } catch (parseError) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid problem context format',
+          details: parseError.message 
+        }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     // Get OpenAI API key from environment
@@ -110,105 +127,89 @@ serve(async (req) => {
       description: string;
       content: string;
       judgementCriteria: string;
-    } | null) => {
-      if (!problemContext) {
-        // Fallback to generic prompt if no problem context
-        return `I'm sharing a system design diagram I've drawn along with audio commentary. Please analyze both and provide insightful feedback.
-
-Audio Commentary: "${transcribedText}"
-
-Please:
-1. Describe what you see in the diagram
-2. Analyze how the audio commentary relates to the visual elements
-3. Provide constructive feedback on the system design
-4. Suggest improvements or highlight potential issues
-5. Rate the overall design approach (1-10) and explain why
-
-Be specific, helpful, and encouraging in your analysis.`
-      }
-
+    }) => {
       return `You are an expert software architect and senior technical interviewer evaluating a system design solution.
 
-**PROBLEM CONTEXT:**
+**Problem Context:**
 Problem: ${problemContext.title}
 Description: ${problemContext.description}
 Requirements: ${problemContext.content}
 Judgment Criteria: ${problemContext.judgementCriteria}
 
-**CANDIDATE SUBMISSION:**
+**Candidate Submission:**
 - Visual Diagram: [Attached image of their system design]
 - Audio Commentary: "${transcribedText}"
 
-**EVALUATION FRAMEWORK:**
+**Evaluation Framework:**
 As a senior-level assessment, provide comprehensive analysis across these dimensions:
 
-**1. PROBLEM COMPREHENSION & REQUIREMENTS**
+**1. Problem Comprehension & Requirements**
 - Assess understanding of the core problem and business context
 - Identify which functional requirements were addressed and which were missed
 - Evaluate consideration of scale, constraints, and edge cases
 - Detail any non-functional requirements that should have been considered
 
-**2. SYSTEM ARCHITECTURE & DESIGN**
+**2. System Architecture & Design**
 - Analyze the overall architecture structure and soundness
 - Examine system boundaries and component responsibilities
 - Review adherence to established architectural patterns
 - Assess separation of concerns and abstraction layers
 - Evaluate how well the design handles expected scale and load
 
-**3. TECHNICAL DEPTH & ACCURACY**
+**3. Technical Depth & Accuracy**
 - Review technical soundness of proposed solutions
 - Assess depth of understanding of chosen components
 - Analyze data flows, APIs, and interface designs
 - Evaluate database design appropriateness
 - Review caching, queuing, and storage strategies
 
-**4. SCALABILITY & PERFORMANCE**
+**4. Scalability & Performance**
 - Examine growth handling capabilities for users, data, and traffic
 - Identify bottlenecks and their mitigation strategies
 - Assess load balancing and distribution approaches
 - Review horizontal scaling considerations
 - Analyze performance optimization strategies
 
-**5. COMMENTARY-DESIGN ALIGNMENT**
+**5. Commentary-Design Alignment**
 - Evaluate how comprehensively the verbal commentary describes the visual diagram
 - Identify components, connections, and data flows missing from the audio explanation
 - Assess consistency between drawn elements and verbal explanations
 - Analyze whether the candidate walked through their system architecture as depicted
 
-**6. RELIABILITY & FAULT TOLERANCE**
+**6. Reliability & Fault Tolerance**
 - Identify single points of failure and their mitigation strategies
 - Assess redundancy and failover mechanisms
 - Review handling of partial failures and degraded states
 - Evaluate monitoring, alerting, and observability considerations
 
-**7. COMMUNICATION & REASONING**
+**7. Communication & Reasoning**
 - Assess clarity of design decision explanations
 - Review articulation of trade-offs and alternative approaches
 - Evaluate logical structure and reasoning quality
 - Assess awareness of complexity and implementation challenges
 
-**ANALYSIS APPROACH:**
+**Analysis Approach:**
 For each dimension, provide thorough analysis that identifies both strengths and gaps. When elements are missing or inadequately addressed, explain in detail:
 - What specifically should have been included
 - Why these elements are important for this type of system
 - How their absence impacts the overall design
 - Concrete examples of what a senior-level approach would include
 
-**DETAILED FEEDBACK AREAS:**
+**Detailed Feedback Areas:**
 
-**1. VISUAL DESIGN ANALYSIS**
+**1. Visual Design Analysis**
 - Comprehensively describe what is shown in the diagram
 - Identify all components, connections, and data flows depicted
 - Note any missing critical components that should be present
 - Assess the clarity and completeness of the visual representation
 
-**2. COMMENTARY COMPLETENESS ASSESSMENT**
+**2. Commentary Completeness Assessment**
 - Compare the verbal explanation against the visual elements
 - Identify specific diagram components not mentioned in the audio
 - Highlight inconsistencies between visual and verbal descriptions
 - Assess the depth and technical accuracy of the explanations provided
 
-**3. MISSING CRITICAL ELEMENTS**
+**3. Missing Critical Elements**
 For each missing element, provide detailed explanation including:
 - **What was missed**: Specific component, pattern, or consideration
 - **Why it matters**: Technical and business importance
@@ -216,19 +217,19 @@ For each missing element, provide detailed explanation including:
 - **Senior-level expectation**: What a experienced architect would have included
 - **Implementation guidance**: Concrete suggestions for addressing the gap
 
-**4. TECHNICAL DEPTH ANALYSIS**
+**4. Technical Depth Analysis**
 - Evaluate the sophistication of proposed solutions
 - Identify areas where deeper technical understanding should be demonstrated
 - Highlight opportunities for more advanced architectural patterns
 - Assess consideration of real-world implementation challenges
 
-**5. PROBLEM-SPECIFIC EVALUATION**
+**5. Problem-Specific Evaluation**
 - Analyze how well the solution addresses the unique challenges of this specific problem
 - Identify domain-specific considerations that were missed
 - Evaluate understanding of the business context and user needs
 - Assess scalability requirements specific to this use case
 
-**RESPONSE FORMAT:**
+**Response Format:**
 Provide a comprehensive analysis that serves as both evaluation and learning opportunity. Focus on detailed explanations that help the candidate understand not just what was missing, but why it matters and how to improve. Use specific examples and technical details to illustrate points.`
     }
 
