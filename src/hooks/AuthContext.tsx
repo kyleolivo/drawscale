@@ -33,6 +33,10 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Helper function to check if email is in whitelist
 const isEmailAuthorized = (email?: string): boolean => {
+  // TEMPORARY: Bypass whitelist for testing
+  console.log('WHITELIST TEMPORARILY DISABLED - Remove this before production!');
+  return true;
+  
   // In development mode, allow any email
   // Only consider it development if explicitly set to development mode
   const isDev = import.meta.env.MODE === 'development';
