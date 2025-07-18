@@ -88,14 +88,18 @@ function DrawCanvas(): JSX.Element {
   };
 
   const captureCanvasImage = async (): Promise<Blob | null> => {
-    if (!excalidrawElements || excalidrawElements.length === 0) {
-      console.error('No Excalidraw elements available');
-      return null;
+    // If no elements are available yet, try to get the initial data
+    let elementsToExport = excalidrawElements;
+    
+    if (!elementsToExport || elementsToExport.length === 0) {
+      console.warn('No Excalidraw elements in state, using initial diagram');
+      // Fall back to the initial diagram if no elements are captured yet
+      elementsToExport = createBitlySystemDiagram() as readonly ExcalidrawElement[];
     }
 
     try {
       const canvas = await exportToCanvas({
-        elements: excalidrawElements,
+        elements: elementsToExport,
         appState: excalidrawAppState || {
           viewBackgroundColor: "#ffffff",
           exportBackground: true
@@ -143,10 +147,8 @@ function DrawCanvas(): JSX.Element {
         judgementCriteria: appState.currentProblem.judgementCriteria
       };
       
-      // const userEmail = user?.email;
-      // if (!userEmail) {
-      //   throw new Error('User email is required for analysis');
-      // }
+      // Temporarily pass empty string for userEmail while whitelist is disabled
+      const userEmail = user?.email || '';
       
       const result = await transcribeAudioWithImage(audioBlob, imageBlob, userEmail, problemContext);
       
@@ -746,15 +748,15 @@ function DrawCanvas(): JSX.Element {
               appState: { viewBackgroundColor: "#ffffff" }
             }}
             onChange={useCallback((elements: readonly ExcalidrawElement[], appState: AppState, files: BinaryFiles) => {
-              // Skip the first few onChange calls during initialization
-              if (isInitializing.current) {
-                isInitializing.current = false;
-                return;
-              }
-              
+              // Always update the state, even during initialization
               setExcalidrawElements(elements);
               setExcalidrawAppState(appState);
               setExcalidrawFiles(files);
+              
+              // Mark initialization as complete after first change
+              if (isInitializing.current) {
+                isInitializing.current = false;
+              }
             }, [])}
           />
         </div>
