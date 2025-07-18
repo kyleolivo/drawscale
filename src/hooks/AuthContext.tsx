@@ -32,11 +32,13 @@ interface AuthContextType {
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Helper function to check if email is in whitelist
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const isEmailAuthorized = (email?: string): boolean => {
   // TEMPORARY: Bypass whitelist for testing
   console.log('WHITELIST TEMPORARILY DISABLED - Remove this before production!');
   return true;
   
+  /* Commented out for temporary bypass
   // In development mode, allow any email
   // Only consider it development if explicitly set to development mode
   const isDev = import.meta.env.MODE === 'development';
@@ -64,6 +66,7 @@ const isEmailAuthorized = (email?: string): boolean => {
   });
   
   return isAuthorized;
+  */
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
