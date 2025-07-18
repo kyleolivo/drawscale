@@ -27,6 +27,7 @@ serve(async (req) => {
     const formData = await req.formData()
     const audioFile = formData.get('audio') as File
     const imageFile = formData.get('image') as File
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const userEmail = formData.get('userEmail') as string
     const problemContextJson = formData.get('problemContext') as string
 
@@ -41,16 +42,17 @@ serve(async (req) => {
     }
 
     // Check if user email is authorized
-    if (!userEmail) {
-      return new Response(
-        JSON.stringify({ error: 'User email is required' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      )
-    }
+    // if (!userEmail) {
+    //   return new Response(
+    //     JSON.stringify({ error: 'User email is required' }),
+    //     { 
+    //       status: 400, 
+    //       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+    //     }
+    //   )
+    // }
 
+    /* Commented out for temporary bypass
     // Check if we're in development mode (skip authorization for dev)
     const isProduction = Deno.env.get('ENVIRONMENT') === 'production' || Deno.env.get('NODE_ENV') === 'production';
     
@@ -66,6 +68,7 @@ serve(async (req) => {
         )
       }
     }
+    */
 
     // Parse problem context (required)
     if (!problemContextJson) {
