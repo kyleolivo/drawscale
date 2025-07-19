@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Excalidraw, exportToCanvas } from "@excalidraw/excalidraw";
-import type { ExcalidrawElement, AppState, BinaryFiles } from "@excalidraw/excalidraw/types/types";
+import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types/types";
+import type { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import { useAuth } from '../hooks/useAuth';
 import ProblemDrawer, { DrawerToggle } from './ProblemDrawer';
 import RecordButton from './RecordButton';

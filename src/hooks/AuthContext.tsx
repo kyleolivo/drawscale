@@ -33,7 +33,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // Helper function to check if email is in whitelist
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const isEmailAuthorized = (email?: string): boolean => {
+const isEmailAuthorized = (_email?: string): boolean => {
   // TEMPORARY: Bypass whitelist for testing
   console.log('WHITELIST TEMPORARILY DISABLED - Remove this before production!');
   return true;
