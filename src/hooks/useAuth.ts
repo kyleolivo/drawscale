@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import { User as DatabaseUser } from '../types/user';
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -8,5 +9,8 @@ export function useAuth() {
   }
   return context;
 }
+
+// Export the database user type for convenience
+export type { DatabaseUser };
 
 export { AuthProvider } from './AuthContext';
