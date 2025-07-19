@@ -14,7 +14,6 @@ The pre-push hook runs the following validation checks:
 
 1. **ESLint** - Code linting to ensure code quality and consistency
 2. **Unit Tests** - Runs all unit tests using Vitest
-3. **E2E Tests** - Runs end-to-end tests using Playwright in headless mode
 
 #### Installation
 
@@ -56,6 +55,5 @@ The pre-push hook uses these npm scripts (defined in `package.json`):
 
 - `npm run lint` - Runs ESLint on all TypeScript/JavaScript files
 - `npm run test:run` - Runs unit tests in headless mode (no UI)
-- `npm run test:e2e` - Runs E2E tests in headless mode
 
 All commands are configured to run without requiring user input, making them suitable for automated execution in CI/CD pipelines and git hooks. 
