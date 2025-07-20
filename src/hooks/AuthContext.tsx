@@ -88,6 +88,10 @@ const createOrRetrieveUser = async (userData: AppleSignInData): Promise<Database
       const devUser = await UserService.getUserByEmail('dev@example.com');
       if (devUser) {
         console.log('Found existing dev user:', devUser);
+        // Check if dev user is banned
+        if (devUser.banhammer === true) {
+          throw new Error('Access denied: Your account has been suspended.');
+        }
         return devUser;
       } else {
         throw new Error('Dev user not found in database. Please run database migration.');
@@ -100,12 +104,17 @@ const createOrRetrieveUser = async (userData: AppleSignInData): Promise<Database
       if (existingUser) {
         console.log('Found existing user by email:', existingUser);
         
+        // Check if user is banned
+        if (existingUser.banhammer === true) {
+          throw new Error('Access denied: Your account has been suspended.');
+        }
+        
         // Update user with latest Apple ID token if available
         if (appleIdToken && existingUser.apple_id_token !== appleIdToken) {
           const updatedUser = await UserService.updateUser(existingUser.id, {
             apple_id_token: appleIdToken,
-            first_name: firstName || existingUser.first_name,
-            last_name: lastName || existingUser.last_name,
+            first_name: firstName || existingUser.first_name || undefined,
+            last_name: lastName || existingUser.last_name || undefined,
             provider: provider
           });
           return updatedUser;
@@ -120,6 +129,12 @@ const createOrRetrieveUser = async (userData: AppleSignInData): Promise<Database
       const existingUser = await UserService.getUserByAppleIdToken(appleIdToken);
       if (existingUser) {
         console.log('Found existing user by Apple ID token:', existingUser);
+        
+        // Check if user is banned
+        if (existingUser.banhammer === true) {
+          throw new Error('Access denied: Your account has been suspended.');
+        }
+        
         return existingUser;
       }
     }
@@ -148,6 +163,27 @@ const createOrRetrieveUser = async (userData: AppleSignInData): Promise<Database
   }
 };
 
+// Helper function to create auth user object from database user
+const createAuthUser = (dbUser: DatabaseUser): User => ({
+  id: dbUser.id,
+  email: dbUser.email ?? undefined,
+  name: (dbUser.first_name && dbUser.last_name ? 
+    `${dbUser.first_name} ${dbUser.last_name}`.trim() : 
+    (dbUser.first_name ?? dbUser.last_name ?? undefined))
+});
+
+// Helper function to save user data to localStorage
+const saveUserData = (authUser: User, dbUser: DatabaseUser) => {
+  localStorage.setItem('drawscale_user', JSON.stringify(authUser));
+  localStorage.setItem('drawscale_database_user', JSON.stringify(dbUser));
+};
+
+// Helper function to clear user data from localStorage
+const clearUserData = () => {
+  localStorage.removeItem('drawscale_user');
+  localStorage.removeItem('drawscale_database_user');
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [databaseUser, setDatabaseUser] = useState<DatabaseUser | null>(null);
@@ -166,8 +202,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setDatabaseUser(parsedDatabaseUser);
       } catch (error) {
         console.error('Error parsing stored user data:', error);
-        localStorage.removeItem('drawscale_user');
-        localStorage.removeItem('drawscale_database_user');
+        clearUserData();
       }
     }
     setIsLoading(false);
@@ -179,27 +214,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const dbUser = await createOrRetrieveUser(userData);
       
       // Create the auth user object
-      const authUser: User = {
-        id: dbUser.id, // Use the database ID as the auth ID
-        email: dbUser.email ?? undefined,
-        name: (dbUser.first_name && dbUser.last_name ? 
-          `${dbUser.first_name} ${dbUser.last_name}`.trim() : 
-          (dbUser.first_name ?? dbUser.last_name ?? undefined))
-      };
+      const authUser = createAuthUser(dbUser);
       
       // Only set user if they're authorized
       if (isEmailAuthorized(authUser.email)) {
         setUser(authUser);
         setDatabaseUser(dbUser);
-        localStorage.setItem('drawscale_user', JSON.stringify(authUser));
-        localStorage.setItem('drawscale_database_user', JSON.stringify(dbUser));
+        saveUserData(authUser, dbUser);
         console.log('User signed in successfully:', { authUser, dbUser });
       } else {
         // Clear any existing auth data for unauthorized users
         setUser(null);
         setDatabaseUser(null);
-        localStorage.removeItem('drawscale_user');
-        localStorage.removeItem('drawscale_database_user');
+        clearUserData();
         throw new Error('Access denied: Your email is not authorized to use this service.');
       }
     } catch (error) {
@@ -211,8 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = () => {
     setUser(null);
     setDatabaseUser(null);
-    localStorage.removeItem('drawscale_user');
-    localStorage.removeItem('drawscale_database_user');
+    clearUserData();
   };
 
   const value = {

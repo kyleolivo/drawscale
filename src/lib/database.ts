@@ -1,4 +1,4 @@
-import { supabaseAdmin } from './supabase';
+import { supabase } from './supabase';
 import { User, CreateUserData, UpdateUserData } from '../types/user';
 
 export class UserService {
@@ -6,7 +6,7 @@ export class UserService {
    * Get a user by ID
    */
   static async getUserById(id: string): Promise<User | null> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('id', id)
@@ -24,7 +24,7 @@ export class UserService {
    * Get a user by email
    */
   static async getUserByEmail(email: string): Promise<User | null> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('email', email)
@@ -42,7 +42,7 @@ export class UserService {
    * Get a user by Apple ID token
    */
   static async getUserByAppleIdToken(appleIdToken: string): Promise<User | null> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('apple_id_token', appleIdToken)
@@ -60,7 +60,7 @@ export class UserService {
    * Create a new user
    */
   static async createUser(userData: CreateUserData): Promise<User> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .insert([userData])
       .select()
@@ -80,7 +80,7 @@ export class UserService {
   static async updateUser(id: string, userData: UpdateUserData): Promise<User> {
     console.log('Attempting to update user:', { id, userData });
     
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .update(userData)
       .eq('id', id)
@@ -105,7 +105,7 @@ export class UserService {
    * Delete a user
    */
   static async deleteUser(id: string): Promise<void> {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('users')
       .delete()
       .eq('id', id);
@@ -118,12 +118,13 @@ export class UserService {
 
   /**
    * Get all users (with optional pagination)
+   * Note: This requires admin privileges and should only be used in admin contexts
    */
   static async getAllUsers(page: number = 0, pageSize: number = 50): Promise<User[]> {
     const from = page * pageSize;
     const to = from + pageSize - 1;
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .range(from, to)
@@ -139,9 +140,10 @@ export class UserService {
 
   /**
    * Search users by name (first_name or last_name)
+   * Note: This requires admin privileges and should only be used in admin contexts
    */
   static async searchUsersByName(searchTerm: string): Promise<User[]> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .or(`first_name.ilike.%${searchTerm}%,last_name.ilike.%${searchTerm}%`)
@@ -157,9 +159,10 @@ export class UserService {
 
   /**
    * Get users by provider
+   * Note: This requires admin privileges and should only be used in admin contexts
    */
   static async getUsersByProvider(provider: string): Promise<User[]> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('provider', provider)
@@ -175,9 +178,10 @@ export class UserService {
 
   /**
    * Get banned users
+   * Note: This requires admin privileges and should only be used in admin contexts
    */
   static async getBannedUsers(): Promise<User[]> {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('users')
       .select('*')
       .eq('banhammer', true)
@@ -193,6 +197,7 @@ export class UserService {
 
   /**
    * Ban a user
+   * Note: This requires admin privileges and should only be used in admin contexts
    */
   static async banUser(id: string): Promise<User> {
     return this.updateUser(id, { banhammer: true });
@@ -200,6 +205,7 @@ export class UserService {
 
   /**
    * Unban a user
+   * Note: This requires admin privileges and should only be used in admin contexts
    */
   static async unbanUser(id: string): Promise<User> {
     return this.updateUser(id, { banhammer: false });

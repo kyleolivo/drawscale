@@ -2,14 +2,15 @@
 -- This file contains development-specific data and policies
 
 -- Insert dev user for development (only if it doesn't exist)
-insert into public.users (id, email, provider, first_name, last_name, apple_id_token)
+insert into public.users (id, email, provider, first_name, last_name, apple_id_token, banhammer)
 select 
   gen_random_uuid(),
   'dev@example.com',
   'dev',
   'Dev',
   'User',
-  'dev-token'
+  'dev-token',
+  false
 where not exists (
   select 1 from public.users where email = 'dev@example.com'
 );

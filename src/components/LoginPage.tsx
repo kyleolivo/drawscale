@@ -128,7 +128,7 @@ function LoginPage({ onSignIn }: LoginPageProps): JSX.Element {
           {error && (
             <div className="error-message">
               {error}
-              <button onClick={() => setError(null)}>×</button>
+              <button onClick={() => setError(null)}>X</button>
             </div>
           )}
           

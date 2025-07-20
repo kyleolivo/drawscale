@@ -25,29 +25,14 @@ create unique index users_email_unique_idx on public.users (email) where email i
 alter table public.users enable row level security;
 
 -- Create policies for secure access
--- Allow users to read their own data
-create policy "Users can view own data" on public.users
-  for select using (auth.uid()::text = id::text);
+-- Allow public access for user lookup by email and Apple ID token (for authentication)
+create policy "Allow public user lookup for authentication" on public.users
+  for select using (true);
 
--- Allow users to update their own data
-create policy "Users can update own data" on public.users
-  for update using (auth.uid()::text = id::text);
+-- Allow public access for user creation (for new sign-ups)
+create policy "Allow public user creation" on public.users
+  for insert with check (true);
 
--- Allow service role to perform all operations (for admin functions)
-create policy "Service role can perform all operations" on public.users
-  for all using (auth.role() = 'service_role' or auth.jwt() ->> 'role' = 'service_role');
-
--- Create a function to automatically create a user record when someone signs up
-create or replace function public.handle_new_user()
-returns trigger as $$
-begin
-  insert into public.users (id, email, provider)
-  values (new.id, new.email, new.raw_app_meta_data->>'provider');
-  return new;
-end;
-$$ language plpgsql security definer;
-
--- Create trigger to automatically create user record on signup
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user(); 
+-- Allow public access for user updates (for profile updates)
+create policy "Allow public user updates" on public.users
+  for update using (true);
