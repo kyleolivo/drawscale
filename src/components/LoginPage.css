@@ -53,7 +53,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   transition: background-color 0.2s ease;
 }
 
@@ -63,6 +63,67 @@
 
 .apple-signin-button:active {
   background: #555;
+}
+
+.apple-signin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-signin-button {
+  background: #fff;
+  color: #333;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+}
+
+.google-signin-button:hover {
+  background: #f8f9fa;
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+}
+
+.google-signin-button:active {
+  background: #e8eaed;
+}
+
+.google-signin-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.signin-divider {
+  color: #666;
+  margin: 1.5rem 0;
+  font-size: 14px;
+  position: relative;
+}
+
+.signin-divider::before,
+.signin-divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.signin-divider::before {
+  left: 0;
+}
+
+.signin-divider::after {
+  right: 0;
 }
 
 .login-info {
@@ -76,4 +137,28 @@
   font-size: 0.85rem;
   line-height: 1.4;
   margin: 0;
+}
+
+.error-message {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.error-message button {
+  background: none;
+  border: none;
+  color: #c33;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  margin-left: 8px;
 }

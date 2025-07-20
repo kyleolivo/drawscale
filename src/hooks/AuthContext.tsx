@@ -1,32 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { UserService } from "../lib/database";
-import { CreateUserData, User as DatabaseUser } from "../types/user";
+import { Session, User as SupabaseUser } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabase";
 
 interface User {
   id: string;
   email?: string;
   name?: string;
-}
-
-interface AppleSignInData {
-  authorization?: {
-    id_token?: string;
-  };
-  user?: string | {
-    email?: string;
-    name?: {
-      firstName?: string;
-      lastName?: string;
-    };
-  };
+  provider?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  databaseUser: DatabaseUser | null;
-  signIn: (userData: AppleSignInData) => Promise<void>;
-  signOut: () => void;
+  session: Session | null;
+  signOut: () => Promise<void>;
   isAuthenticated: boolean;
   isAuthorized: boolean;
   isLoading: boolean;
@@ -36,184 +23,86 @@ export const AuthContext = createContext<AuthContextType | undefined>(
   undefined,
 );
 
-// Helper function to create or retrieve user from database
-const createOrRetrieveUser = async (
-  userData: AppleSignInData,
-): Promise<DatabaseUser> => {
-  const email = typeof userData.user === "object"
-    ? userData.user?.email
-    : undefined;
-  const firstName = typeof userData.user === "object" && userData.user?.name
-    ? userData.user.name.firstName
-    : undefined;
-  const lastName = typeof userData.user === "object" && userData.user?.name
-    ? userData.user.name.lastName
-    : undefined;
-  const appleIdToken = userData.authorization?.id_token;
-
-  // Determine provider based on the data
-  const provider = appleIdToken ? "apple" : "dev";
-
-  try {
-    // For dev user, always return the existing dev user from database
-    if (provider === "dev" && email === "dev@example.com") {
-      const devUser = await UserService.getUserByEmail("dev@example.com");
-      if (devUser) {
-        console.log("Found existing dev user:", devUser);
-        // Check if dev user is banned
-        if (devUser.banhammer === true) {
-          throw new Error("Access denied: Your account has been suspended.");
-        }
-        return devUser;
-      } else {
-        throw new Error(
-          "Dev user not found in database. Please run database migration.",
-        );
-      }
-    }
-
-    // For Apple users, try to find existing user by email
-    if (email) {
-      const existingUser = await UserService.getUserByEmail(email);
-      if (existingUser) {
-        console.log("Found existing user by email:", existingUser);
-
-        // Check if user is banned
-        if (existingUser.banhammer === true) {
-          throw new Error("Access denied: Your account has been suspended.");
-        }
-
-        // Update user with latest Apple ID token if available
-        if (appleIdToken && existingUser.apple_id_token !== appleIdToken) {
-          const updatedUser = await UserService.updateUser(existingUser.id, {
-            apple_id_token: appleIdToken,
-            first_name: firstName || existingUser.first_name || undefined,
-            last_name: lastName || existingUser.last_name || undefined,
-            provider: provider,
-          });
-          return updatedUser;
-        }
-
-        return existingUser;
-      }
-    }
-
-    // If no user found by email, try by Apple ID token
-    if (appleIdToken) {
-      const existingUser = await UserService.getUserByAppleIdToken(
-        appleIdToken,
-      );
-      if (existingUser) {
-        console.log("Found existing user by Apple ID token:", existingUser);
-
-        // Check if user is banned
-        if (existingUser.banhammer === true) {
-          throw new Error("Access denied: Your account has been suspended.");
-        }
-
-        return existingUser;
-      }
-    }
-
-    // Create new user if none exists (only for Apple users)
-    const newUserData: CreateUserData = {
-      email,
-      provider,
-      apple_id_token: appleIdToken,
-      first_name: firstName,
-      last_name: lastName,
-    };
-
-    console.log("Creating new user:", newUserData);
-    const newUser = await UserService.createUser(newUserData);
-    console.log("Created new user:", newUser);
-    return newUser;
-  } catch (error) {
-    console.error("Error creating/retrieving user:", error);
-    if (error instanceof Error) {
-      throw new Error(
-        `Failed to create or retrieve user from database: ${error.message}`,
-      );
-    } else {
-      throw new Error("Failed to create or retrieve user from database");
-    }
-  }
-};
-
-// Helper function to create auth user object from database user
-const createAuthUser = (dbUser: DatabaseUser): User => ({
-  id: dbUser.id,
-  email: dbUser.email ?? undefined,
-  name:
-    (dbUser.first_name && dbUser.last_name
-      ? `${dbUser.first_name} ${dbUser.last_name}`.trim()
-      : (dbUser.first_name ?? dbUser.last_name ?? undefined)),
-});
-
-// Helper function to save user data to localStorage
-const saveUserData = (authUser: User, dbUser: DatabaseUser) => {
-  localStorage.setItem("drawscale_user", JSON.stringify(authUser));
-  localStorage.setItem("drawscale_database_user", JSON.stringify(dbUser));
-};
-
-// Helper function to clear user data from localStorage
-const clearUserData = () => {
-  localStorage.removeItem("drawscale_user");
-  localStorage.removeItem("drawscale_database_user");
+// Helper function to create auth user object from Supabase user
+const createAuthUser = (supabaseUser: SupabaseUser): User => {
+  const metadata = supabaseUser.user_metadata || {};
+  const provider = supabaseUser.app_metadata?.provider || 'unknown';
+  
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email,
+    name: metadata.full_name || 
+          (metadata.name ? 
+            `${metadata.name.first_name || ''} ${metadata.name.last_name || ''}`.trim() :
+            metadata.first_name && metadata.last_name ?
+              `${metadata.first_name} ${metadata.last_name}` :
+              metadata.first_name || metadata.last_name || undefined),
+    provider: provider,
+  };
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [databaseUser, setDatabaseUser] = useState<DatabaseUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored auth data on mount
-    const storedUser = localStorage.getItem("drawscale_user");
-    const storedDatabaseUser = localStorage.getItem("drawscale_database_user");
-
-    if (storedUser && storedDatabaseUser) {
+    // Get initial session
+    const getInitialSession = async () => {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        const parsedDatabaseUser = JSON.parse(storedDatabaseUser);
-        setUser(parsedUser);
-        setDatabaseUser(parsedDatabaseUser);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+        } else if (session) {
+          setSession(session);
+          setUser(createAuthUser(session.user));
+        }
       } catch (error) {
-        console.error("Error parsing stored user data:", error);
-        clearUserData();
+        console.error('Error in getInitialSession:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    };
+
+    getInitialSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session);
+        
+        setSession(session);
+        
+        if (session && session.user) {
+          setUser(createAuthUser(session.user));
+        } else {
+          setUser(null);
+        }
+        
+        setIsLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (userData: AppleSignInData) => {
+  const signOut = async () => {
     try {
-      // Create or retrieve user from database
-      const dbUser = await createOrRetrieveUser(userData);
-
-      // Create the auth user object
-      const authUser = createAuthUser(dbUser);
-
-      setUser(authUser);
-      setDatabaseUser(dbUser);
-      saveUserData(authUser, dbUser);
-      console.log("User signed in successfully:", { authUser, dbUser });
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
+        throw error;
+      }
     } catch (error) {
-      console.error("Sign in error:", error);
+      console.error('Sign out error:', error);
       throw error;
     }
   };
 
-  const signOut = () => {
-    setUser(null);
-    setDatabaseUser(null);
-    clearUserData();
-  };
-
   const value = {
     user,
-    databaseUser,
-    signIn,
+    session,
     signOut,
     isAuthenticated: !!user,
     isAuthorized: !!user,

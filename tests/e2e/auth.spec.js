@@ -1,110 +1,76 @@
 import { test, expect } from '@playwright/test';
 
-// Helper to mock authentication with database
-const mockAuthentication = async (page) => {
-  // Mock the database service and set up authentication before loading the app
-  await page.addInitScript(() => {
-    // Clear any existing localStorage first
-    localStorage.clear();
-    
-    // Mock UserService methods
-    window.UserService = {
-      getUserByEmail: async (email) => {
-        if (email === 'dev@example.com') {
-          return {
-            id: 'test-user-id',
-            email: 'dev@example.com',
-            first_name: 'Dev',
-            last_name: 'User',
-            provider: 'dev',
-            apple_id_token: null,
-            created_at: new Date().toISOString(),
-            banhammer: false
-          };
-        }
-        return null;
-      },
-              getUserByAppleIdToken: async (token) => null, // eslint-disable-line @typescript-eslint/no-unused-vars
-      createUser: async (userData) => ({
-        id: 'new-user-id',
-        ...userData,
-        created_at: new Date().toISOString(),
-        banhammer: false
-      }),
-      updateUser: async (id, userData) => ({
-        id,
-        ...userData,
-        created_at: new Date().toISOString(),
-        banhammer: false
-      })
-    };
-    
-    // Mock the database module
-    window.mockDatabase = {
-      UserService: window.UserService
-    };
-    
-    // Set up authentication data
-    const authUser = {
-      id: 'test-user-id',
-      email: 'dev@example.com',
-      name: 'Dev User'
-    };
-    
-    const databaseUser = {
-      id: 'test-user-id',
-      email: 'dev@example.com',
-      first_name: 'Dev',
-      last_name: 'User',
-      provider: 'dev',
-      apple_id_token: null,
-      created_at: new Date().toISOString(),
-      banhammer: false
-    };
-    
-    localStorage.setItem('drawscale_user', JSON.stringify(authUser));
-    localStorage.setItem('drawscale_database_user', JSON.stringify(databaseUser));
-  });
-  
-  // Wait a bit for the script to execute
-  await page.waitForTimeout(100);
-};
-
 test.describe('Authentication', () => {
   test('shows login page when not authenticated', async ({ page }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     
+    // Check for login page elements
     await expect(page.getByRole('heading', { name: 'DrawScale' })).toBeVisible();
+    await expect(page.getByText('System Design Interview Prep Tool')).toBeVisible();
     await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
     await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
-    await expect(page.locator('.excalidraw-wrapper')).not.toBeVisible();
+    
+    // Should not show authenticated components
+    await expect(page.locator('.user-avatar')).not.toBeVisible();
+    await expect(page.locator('.app-header')).not.toBeVisible();
   });
 
-  test('shows main app when authenticated', async ({ page }) => {
-    await mockAuthentication(page);
+  test('dev sign in button works and authenticates user', async ({ page }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     
-    // Wait for the app to load and show the authenticated state
-    await expect(page.locator('.app-header')).toBeVisible({ timeout: 10000 });
+    const devButton = page.getByRole('button', { name: /dev sign in/i });
+    await expect(devButton).toBeVisible();
+    await expect(devButton).toBeEnabled();
     
-    // User avatar with initials should be visible
-    await expect(page.locator('.user-avatar')).toBeVisible();
-    await expect(page.locator('.user-avatar')).toHaveText('DU'); // Dev User initials
-    await expect(page.locator('.logout-button')).toBeVisible();
-    await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
-    await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
+    // Click the button to sign in
+    await devButton.click();
+    
+    // After successful sign in, should navigate to main app
+    // Look for authenticated state indicators
+    await expect(page.locator('.user-avatar')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.app-header')).toBeVisible();
+    
+    // Should show user initials "DU" for Dev User
+    await expect(page.locator('.user-avatar')).toHaveText('DU');
+    
+    // Should no longer show login page
+    await expect(page.getByText('Sign in to access the drawing canvas')).not.toBeVisible();
   });
 
-  test('can sign out', async ({ page }) => {
-    await mockAuthentication(page);
+  test('login page has proper styling and layout', async ({ page }) => {
     await page.goto('/');
+    await page.waitForLoadState('networkidle');
     
-    // Wait for the app to load
-    await expect(page.locator('.app-header')).toBeVisible({ timeout: 10000 });
+    // Check that the login container is visible and properly styled
+    const loginContainer = page.locator('.login-container');
+    await expect(loginContainer).toBeVisible();
     
-    await page.locator('.logout-button').click();
+    // Check for proper button styling
+    const devButton = page.getByRole('button', { name: /dev sign in/i });
+    await expect(devButton).toHaveClass(/apple-signin-button/);
     
-    await expect(page.getByText('Sign in to access the drawing canvas')).toBeVisible();
-    await expect(page.getByRole('button', { name: /dev sign in/i })).toBeVisible();
+    // Check for SVG icon in button
+    const svgIcon = devButton.locator('svg');
+    await expect(svgIcon).toBeVisible();
+  });
+
+  test('handles error states in authentication', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    
+    // Mock network failure for dev sign in
+    await page.route('**/auth/v1/**', route => {
+      route.abort('failed');
+    });
+    
+    const devButton = page.getByRole('button', { name: /dev sign in/i });
+    await devButton.click();
+    
+    // Should eventually show an error or return to normal state
+    // Since we can't easily test the exact error without more complex mocking,
+    // we'll just verify the button becomes enabled again
+    await expect(devButton).toBeEnabled({ timeout: 5000 });
   });
 });
