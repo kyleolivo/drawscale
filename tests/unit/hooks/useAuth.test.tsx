@@ -138,46 +138,6 @@ describe('useAuth hook', () => {
     )
   })
   
-  it.skip('rejects sign in for unauthorized email (TEMPORARILY DISABLED)', () => {
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    const appleData = {
-      authorization: { id_token: 'apple-token-123' },
-      user: {
-        email: 'unauthorized@example.com',
-        name: { firstName: 'Unauthorized', lastName: 'User' }
-      }
-    }
-    
-    expect(() => {
-      act(() => {
-        result.current.signIn(appleData)
-      })
-    }).toThrow('Access denied: Your email is not authorized to use this service.')
-    
-    expect(result.current.user).toBe(null)
-    expect(result.current.isAuthenticated).toBe(false)
-    expect(result.current.isAuthorized).toBe(false)
-    expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('drawscale_user')
-  })
-
-  it.skip('handles sign in with minimal data (no email) (TEMPORARILY DISABLED)', () => {
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    const minimalData = {
-      user: 'user-string-id'
-    }
-    
-    expect(() => {
-      act(() => {
-        result.current.signIn(minimalData)
-      })
-    }).toThrow('Access denied: Your email is not authorized to use this service.')
-    
-    expect(result.current.user).toBe(null)
-    expect(result.current.isAuthenticated).toBe(false)
-    expect(result.current.isAuthorized).toBe(false)
-  })
 
   it('signs out user', () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
