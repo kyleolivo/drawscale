@@ -1,58 +1,86 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import React, { ReactNode } from 'react'
 import { AuthProvider, useAuth } from '../../../src/hooks/useAuth'
+import type { Session, User as SupabaseUser } from '@supabase/supabase-js'
 
-// Mock the UserService
-vi.mock('../../../src/lib/database', () => ({
-  UserService: {
-    getUserByEmail: vi.fn(),
-    getUserByAppleIdToken: vi.fn(),
-    createUser: vi.fn(),
-    updateUser: vi.fn(),
+// Mock Supabase client
+vi.mock('../../../src/lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(),
+      onAuthStateChange: vi.fn(() => ({
+        data: { subscription: { unsubscribe: vi.fn() } }
+      })),
+      signOut: vi.fn()
+    }
   }
 }))
 
-// Mock import.meta.env for the tests
-const originalEnv = (import.meta as unknown as { env: Record<string, unknown> }).env
-
-// Mock localStorage
-const mockLocalStorage = {
-  getItem: vi.fn(),
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-}
-Object.defineProperty(window, 'localStorage', {
-  value: mockLocalStorage,
-  writable: true
+// Helper to create mock Supabase user
+const createMockSupabaseUser = (overrides: Partial<SupabaseUser> = {}): SupabaseUser => ({
+  id: 'user-123',
+  aud: 'authenticated',
+  role: 'authenticated',
+  email: 'test@example.com',
+  email_confirmed_at: '2024-01-01T00:00:00Z',
+  phone: '',
+  confirmed_at: '2024-01-01T00:00:00Z',
+  last_sign_in_at: '2024-01-01T00:00:00Z',
+  app_metadata: { provider: 'google' },
+  user_metadata: { 
+    full_name: 'Test User',
+    first_name: 'Test',
+    last_name: 'User'
+  },
+  identities: [],
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
+  is_anonymous: false,
+  ...overrides
 })
 
-describe('useAuth hook', () => {
+// Helper to create mock session
+const createMockSession = (user?: SupabaseUser): Session | null => {
+  if (!user) return null
+  
+  return {
+    access_token: 'mock-access-token',
+    refresh_token: 'mock-refresh-token',
+    expires_in: 3600,
+    expires_at: Date.now() / 1000 + 3600,
+    token_type: 'bearer',
+    user
+  }
+}
+
+describe('useAuth hook with Supabase Auth', () => {
+  let mockAuthStateCallback: ((event: string, session: Session | null) => void) | null = null
+
   beforeEach(async () => {
     vi.clearAllMocks()
-    mockLocalStorage.getItem.mockReturnValue(null)
     
-    // Mock console.log to avoid spam in tests
+    // Mock console methods to avoid spam
     vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
     
-    // Reset to production mode for each test
-    Object.defineProperty(import.meta, 'env', {
-      value: {
-        ...originalEnv,
-        MODE: 'production', // Mock production mode for authorization tests
-        PROD: true,
-        DEV: false
-      },
-      writable: true,
-      configurable: true
+    // Reset auth state callback
+    mockAuthStateCallback = null
+    
+    // Get mocked supabase
+    const { supabase } = await import('../../../src/lib/supabase')
+    
+    // Setup default mocks
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({ data: { session: null }, error: null })
+    vi.mocked(supabase.auth.onAuthStateChange).mockImplementation((callback) => {
+      mockAuthStateCallback = callback
+      return { data: { subscription: { unsubscribe: vi.fn() } } }
     })
-    
-    // Reset UserService mocks
-    const { UserService } = await import('../../../src/lib/database')
-    vi.mocked(UserService.getUserByEmail).mockReset()
-    vi.mocked(UserService.getUserByAppleIdToken).mockReset()
-    vi.mocked(UserService.createUser).mockReset()
-    vi.mocked(UserService.updateUser).mockReset()
+    vi.mocked(supabase.auth.signOut).mockResolvedValue({ error: null })
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -60,7 +88,6 @@ describe('useAuth hook', () => {
   )
 
   it('throws error when used outside AuthProvider', () => {
-    // Suppress console.error for this test
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     
     expect(() => {
@@ -70,223 +97,220 @@ describe('useAuth hook', () => {
     consoleSpy.mockRestore()
   })
 
-  it('initializes with null user and loading state', () => {
+  it('initializes with loading state and no user', async () => {
     const { result } = renderHook(() => useAuth(), { wrapper })
     
-    // Initially loading is true, but useEffect runs immediately in tests
-    // By the time we check, loading might already be false
+    // Initially should be loading
+    expect(result.current.isLoading).toBe(true)
     expect(result.current.user).toBeNull()
-    expect(result.current.isAuthenticated).toBe(false)
-    // Loading state might have already completed
-    expect(typeof result.current.isLoading).toBe('boolean')
-  })
-
-  it('loads user from localStorage on mount', async () => {
-    const storedUser = {
-      id: 'stored-user',
-      email: 'stored@example.com',
-      name: 'Stored User'
-    }
-    mockLocalStorage.getItem.mockReturnValue(JSON.stringify(storedUser))
-    
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    // Wait for useEffect to complete
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    })
-    
-    expect(result.current.user).toEqual(storedUser)
-    expect(result.current.isAuthenticated).toBe(true)
-    expect(result.current.isLoading).toBe(false)
-  })
-
-  it('handles invalid stored user data gracefully', async () => {
-    mockLocalStorage.getItem.mockReturnValue('invalid-json')
-    
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    })
-    
-    expect(result.current.user).toBeNull()
-    expect(result.current.isLoading).toBe(false)
-    expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('drawscale_user')
-    
-    consoleSpy.mockRestore()
-  })
-
-  it('signs in user with Apple data when email is authorized', async () => {
-    const { UserService } = await import('../../../src/lib/database')
-    
-    // Mock the database response
-    const mockDbUser = {
-      id: 'db-user-id-123',
-      email: 'apple@example.com',
-      first_name: 'Apple',
-      last_name: 'User',
-      provider: 'apple',
-      apple_id_token: 'apple-token-123',
-      created_at: '2024-01-01T00:00:00Z',
-      banhammer: false
-    }
-    
-    vi.mocked(UserService.getUserByEmail).mockResolvedValue(mockDbUser)
-    
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    const appleData = {
-      authorization: { id_token: 'apple-token-123' },
-      user: {
-        email: 'apple@example.com',
-        name: { firstName: 'Apple', lastName: 'User' }
-      }
-    }
-    
-    await act(async () => {
-      await result.current.signIn(appleData)
-    })
-    
-    expect(result.current.user).toEqual({
-      id: 'db-user-id-123',
-      email: 'apple@example.com',
-      name: 'Apple User'
-    })
-    expect(result.current.isAuthenticated).toBe(true)
-    expect(result.current.isAuthorized).toBe(true)
-    expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
-      'drawscale_user',
-      JSON.stringify({
-        id: 'db-user-id-123',
-        email: 'apple@example.com',
-        name: 'Apple User'
-      })
-    )
-  })
-  
-  it('rejects sign in for unauthorized email', async () => {
-    const { UserService } = await import('../../../src/lib/database')
-    
-    // Mock the database response for unauthorized user
-    const mockDbUser = {
-      id: 'unauthorized-user-id',
-      email: 'unauthorized@example.com',
-      first_name: 'Unauthorized',
-      last_name: 'User',
-      provider: 'apple',
-      apple_id_token: 'apple-token-123',
-      created_at: '2024-01-01T00:00:00Z',
-      banhammer: false
-    }
-    
-    vi.mocked(UserService.getUserByEmail).mockResolvedValue(mockDbUser)
-    
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    const appleData = {
-      authorization: { id_token: 'apple-token-123' },
-      user: {
-        email: 'unauthorized@example.com',
-        name: { firstName: 'Unauthorized', lastName: 'User' }
-      }
-    }
-    
-    // Since authorization is currently bypassed, this should succeed
-    // The test verifies the current behavior rather than the intended behavior
-    await act(async () => {
-      await result.current.signIn(appleData)
-    })
-    
-    expect(result.current.user).toEqual({
-      id: 'unauthorized-user-id',
-      email: 'unauthorized@example.com',
-      name: 'Unauthorized User'
-    })
-    expect(result.current.isAuthenticated).toBe(true)
-    expect(result.current.isAuthorized).toBe(true)
-  })
-
-  it('handles sign in with minimal data (no email)', async () => {
-    const { UserService } = await import('../../../src/lib/database')
-    
-    // Mock the database response for user with no email
-    const mockDbUser = {
-      id: 'minimal-user-id',
-      email: null,
-      first_name: null,
-      last_name: null,
-      provider: 'apple',
-      apple_id_token: 'apple-token-123',
-      created_at: '2024-01-01T00:00:00Z',
-      banhammer: false
-    }
-    
-    vi.mocked(UserService.getUserByAppleIdToken).mockResolvedValue(mockDbUser)
-    
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    const minimalData = {
-      authorization: { id_token: 'apple-token-123' },
-      user: 'user-string-id'
-    }
-    
-    // Since authorization is currently bypassed, this should succeed
-    await act(async () => {
-      await result.current.signIn(minimalData)
-    })
-    
-    expect(result.current.user).toEqual({
-      id: 'minimal-user-id',
-      email: undefined,
-      name: undefined
-    })
-    expect(result.current.isAuthenticated).toBe(true)
-    expect(result.current.isAuthorized).toBe(true)
-  })
-
-  it('signs out user', async () => {
-    const { UserService } = await import('../../../src/lib/database')
-    
-    // Mock the database response for dev user
-    const mockDbUser = {
-      id: 'dev-user-id',
-      email: 'dev@example.com',
-      first_name: 'Dev',
-      last_name: 'User',
-      provider: 'dev',
-      apple_id_token: null,
-      created_at: '2024-01-01T00:00:00Z',
-      banhammer: false
-    }
-    
-    // Clear any previous mocks and set up new ones
-    vi.mocked(UserService.getUserByEmail).mockReset()
-    vi.mocked(UserService.getUserByEmail).mockResolvedValue(mockDbUser)
-    
-    const { result } = renderHook(() => useAuth(), { wrapper })
-    
-    // First sign in - for dev user, don't pass authorization to make provider 'dev'
-    await act(async () => {
-      await result.current.signIn({
-        user: { email: 'dev@example.com' }
-      })
-    })
-    
-    expect(result.current.isAuthenticated).toBe(true)
-    expect(result.current.isAuthorized).toBe(true)
-    
-    // Then sign out
-    act(() => {
-      result.current.signOut()
-    })
-    
-    expect(result.current.user).toBeNull()
+    expect(result.current.session).toBeNull()
     expect(result.current.isAuthenticated).toBe(false)
     expect(result.current.isAuthorized).toBe(false)
-    expect(mockLocalStorage.removeItem).toHaveBeenCalledWith('drawscale_user')
+    
+    // Wait for initial session check to complete
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+    
+    expect(result.current.isLoading).toBe(false)
   })
 
+  it('loads existing session on mount', async () => {
+    const mockUser = createMockSupabaseUser({
+      email: 'existing@example.com',
+      user_metadata: { full_name: 'Existing User' }
+    })
+    const mockSession = createMockSession(mockUser)
+    
+    const { supabase } = await import('../../../src/lib/supabase')
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({ 
+      data: { session: mockSession }, 
+      error: null 
+    })
+    
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+    
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.user).toEqual({
+      id: 'user-123',
+      email: 'existing@example.com',
+      name: 'Existing User',
+      provider: 'google'
+    })
+    expect(result.current.session).toBe(mockSession)
+    expect(result.current.isAuthenticated).toBe(true)
+    expect(result.current.isAuthorized).toBe(true)
+  })
+
+  it('handles auth state changes', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    
+    // Wait for initial setup
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+    
+    expect(result.current.user).toBeNull()
+    
+    // Simulate sign in
+    const mockUser = createMockSupabaseUser({
+      email: 'signin@example.com',
+      app_metadata: { provider: 'apple' },
+      user_metadata: { 
+        name: { first_name: 'Apple', last_name: 'User' }
+      }
+    })
+    const mockSession = createMockSession(mockUser)
+    
+    await act(async () => {
+      if (mockAuthStateCallback) {
+        mockAuthStateCallback('SIGNED_IN', mockSession)
+      }
+    })
+    
+    expect(result.current.user).toEqual({
+      id: 'user-123',
+      email: 'signin@example.com',
+      name: 'Apple User',
+      provider: 'apple'
+    })
+    expect(result.current.session).toBe(mockSession)
+    expect(result.current.isAuthenticated).toBe(true)
+    
+    // Simulate sign out
+    await act(async () => {
+      if (mockAuthStateCallback) {
+        mockAuthStateCallback('SIGNED_OUT', null)
+      }
+    })
+    
+    expect(result.current.user).toBeNull()
+    expect(result.current.session).toBeNull()
+    expect(result.current.isAuthenticated).toBe(false)
+  })
+
+  it('handles user metadata extraction correctly', async () => {
+    const testCases = [
+      {
+        name: 'handles full_name in metadata',
+        user: createMockSupabaseUser({
+          email: 'fullname@example.com',
+          user_metadata: { full_name: 'Full Name User' }
+        }),
+        expectedName: 'Full Name User'
+      },
+      {
+        name: 'handles nested name object',
+        user: createMockSupabaseUser({
+          email: 'nested@example.com',
+          user_metadata: { 
+            name: { first_name: 'Nested', last_name: 'User' }
+          }
+        }),
+        expectedName: 'Nested User'
+      },
+      {
+        name: 'handles separate first/last names',
+        user: createMockSupabaseUser({
+          email: 'separate@example.com',
+          user_metadata: { 
+            first_name: 'Separate',
+            last_name: 'Names'
+          }
+        }),
+        expectedName: 'Separate Names'
+      },
+      {
+        name: 'handles missing name gracefully',
+        user: createMockSupabaseUser({
+          email: 'noname@example.com',
+          user_metadata: {}
+        }),
+        expectedName: undefined
+      }
+    ]
+
+    for (const testCase of testCases) {
+      const mockSession = createMockSession(testCase.user)
+      const { supabase } = await import('../../../src/lib/supabase')
+      vi.mocked(supabase.auth.getSession).mockResolvedValue({ 
+        data: { session: mockSession }, 
+        error: null 
+      })
+      
+      const { result, unmount } = renderHook(() => useAuth(), { wrapper })
+      
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
+      
+      expect(result.current.user?.name).toBe(testCase.expectedName)
+      
+      unmount()
+    }
+  })
+
+  it('handles session errors gracefully', async () => {
+    const mockError = new Error('Session error')
+    const { supabase } = await import('../../../src/lib/supabase')
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({ 
+      data: { session: null }, 
+      error: mockError 
+    })
+    
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
+    
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.user).toBeNull()
+    expect(console.error).toHaveBeenCalledWith('Error getting session:', mockError)
+  })
+
+  it('calls supabase signOut when signOut is called', async () => {
+    const { supabase } = await import('../../../src/lib/supabase')
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    
+    await act(async () => {
+      await result.current.signOut()
+    })
+    
+    expect(vi.mocked(supabase.auth.signOut)).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles signOut errors', async () => {
+    const mockError = new Error('Sign out error')
+    const { supabase } = await import('../../../src/lib/supabase')
+    vi.mocked(supabase.auth.signOut).mockResolvedValue({ error: mockError })
+    
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    
+    await expect(async () => {
+      await act(async () => {
+        await result.current.signOut()
+      })
+    }).rejects.toThrow('Sign out error')
+    
+    expect(console.error).toHaveBeenCalledWith('Error signing out:', mockError)
+  })
+
+  it('unsubscribes from auth changes on unmount', async () => {
+    const mockUnsubscribe = vi.fn()
+    const { supabase } = await import('../../../src/lib/supabase')
+    vi.mocked(supabase.auth.onAuthStateChange).mockReturnValue({
+      data: { subscription: { unsubscribe: mockUnsubscribe } }
+    })
+    
+    const { unmount } = renderHook(() => useAuth(), { wrapper })
+    
+    unmount()
+    
+    expect(mockUnsubscribe).toHaveBeenCalledTimes(1)
+  })
 })

@@ -57,6 +57,24 @@ export class UserService {
   }
 
   /**
+   * Get a user by Google ID token
+   */
+  static async getUserByGoogleIdToken(googleIdToken: string): Promise<User | null> {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('google_id_token', googleIdToken)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching user by Google ID token:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  /**
    * Create a new user
    */
   static async createUser(userData: CreateUserData): Promise<User> {

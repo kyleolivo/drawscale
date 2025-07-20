@@ -77,21 +77,63 @@ drawscale/
 
 ## Authentication
 
-The app includes Apple Sign-In authentication to protect access to OpenAI API features. Users must authenticate before accessing the drawing canvas.
+The app uses Supabase Auth with OAuth providers (Apple and Google) to protect access to OpenAI API features. Users must authenticate before accessing the drawing canvas. Authentication is handled entirely by Supabase, providing built-in user management, session handling, and security.
 
 ### Authentication Flow
-- **Login Page**: Displays Apple Sign-In button when user is not authenticated
+- **Login Page**: Displays Apple Sign-In and Google Sign-In buttons when user is not authenticated
+- **Development Mode**: Shows a "Dev Sign In" button that creates/signs in with a test user (`dev@example.com`)
+- **OAuth Redirect**: Users are redirected to the provider's OAuth flow
+- **Supabase Callback**: Supabase handles the OAuth callback at `/auth/v1/callback` automatically
+- **Session Management**: Supabase automatically manages user sessions and tokens
+- **Auto-redirect**: After successful authentication, users are automatically redirected back to the app
 - **Protected Route**: Main app (Excalidraw canvas) only accessible after authentication
 - **Logout**: Users can sign out from the header bar
-- **Persistence**: Authentication state persists using localStorage
 
 ### Components
-- `LoginPage.tsx` - Apple Sign-In interface
+- `LoginPage.tsx` - OAuth sign-in interface using `supabase.auth.signInWithOAuth()`
 - `DrawCanvas.tsx` - Protected main application component
-- `AuthContext.tsx` - Authentication state management
+- `AuthContext.tsx` - Supabase Auth state management with session handling
 - `useAuth.ts` - Authentication hook
 
-**Note**: You'll need to configure your Apple Developer account and update the `clientId` in `LoginPage.tsx` with your actual App Bundle ID for production use.
+### Supabase Auth Configuration
+Authentication providers are configured in `supabase/config.toml`:
+
+```toml
+[auth.external.apple]
+enabled = true
+client_id = "env(VITE_APPLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
+
+[auth.external.google]
+enabled = true
+client_id = "env(VITE_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+skip_nonce_check = true
+```
+
+### Configuration Steps
+**Apple Sign-In**: 
+1. Configure your Apple Developer account
+2. Set the callback URL to: `{YOUR_SUPABASE_URL}/auth/v1/callback`
+3. Set `VITE_APPLE_CLIENT_ID` with your App Bundle ID
+4. Set `SUPABASE_AUTH_EXTERNAL_APPLE_SECRET` with your Apple secret
+
+**Google Sign-In**:
+1. Create a Google Cloud project and enable Google Sign-In API
+2. Configure OAuth 2.0 credentials with callback URL: `{YOUR_SUPABASE_URL}/auth/v1/callback`
+3. Set `VITE_GOOGLE_CLIENT_ID` with your Google Client ID
+4. Set `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET` with your Google secret
+
+**Important**: The OAuth callback URL should be configured in your provider's console as:
+- **Local development**: `http://localhost:54321/auth/v1/callback`
+- **Production**: `https://your-project.supabase.co/auth/v1/callback`
+
+### User Data
+User information is managed by Supabase Auth and accessed through the session:
+- `user.id` - Unique Supabase user ID
+- `user.email` - User's email address
+- `user.user_metadata` - Provider-specific user data (name, etc.)
+- `user.app_metadata.provider` - OAuth provider used ('apple' or 'google')
 
 ## Testing Strategy
 

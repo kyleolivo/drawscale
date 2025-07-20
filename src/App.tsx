@@ -5,7 +5,7 @@ import DrawCanvas from './components/DrawCanvas';
 import './App.css';
 
 function AppContent(): JSX.Element {
-  const { isAuthenticated, isLoading, signIn } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -16,7 +16,7 @@ function AppContent(): JSX.Element {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage onSignIn={signIn} />;
+    return <LoginPage />;
   }
 
   return (
