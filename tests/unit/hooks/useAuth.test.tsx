@@ -17,7 +17,7 @@ vi.mock('../../../src/lib/database', () => ({
 process.env.VITE_ALLOWED_EMAILS = 'apple@example.com,test@example.com,user@example.com'
 
 // Mock import.meta.env for the tests
-const originalEnv = (import.meta as { env: ImportMetaEnv }).env
+const originalEnv = (import.meta as any).env
 
 // Mock localStorage
 const mockLocalStorage = {
