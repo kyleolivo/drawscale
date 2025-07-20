@@ -13,9 +13,6 @@ vi.mock('../../../src/lib/database', () => ({
   }
 }))
 
-// Set environment variable for tests
-process.env.VITE_ALLOWED_EMAILS = 'apple@example.com,test@example.com,user@example.com'
-
 // Mock import.meta.env for the tests
 const originalEnv = (import.meta as unknown as { env: Record<string, unknown> }).env
 
@@ -42,7 +39,6 @@ describe('useAuth hook', () => {
     Object.defineProperty(import.meta, 'env', {
       value: {
         ...originalEnv,
-        VITE_ALLOWED_EMAILS: 'apple@example.com,test@example.com,user@example.com',
         MODE: 'production', // Mock production mode for authorization tests
         PROD: true,
         DEV: false

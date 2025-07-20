@@ -49,7 +49,7 @@ If you're using Supabase CLI locally:
 supabase start
 
 # Apply the migration
-supabase db push
+supabase db push --local
 ```
 
 If you're using a remote Supabase project:
