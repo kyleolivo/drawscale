@@ -2,14 +2,68 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Audio Recording Flow', () => {
   test.beforeEach(async ({ page }) => {
-    // Mock authentication and audio APIs
+    // Mock the database service and set up authentication before loading the app
     await page.addInitScript(() => {
-      // Mock authentication
-      window.localStorage.setItem('drawscale_user', JSON.stringify({
-        id: 'test-user',
-        email: 'test@example.com',
-        name: 'Test User'
-      }));
+      // Clear any existing localStorage first
+      localStorage.clear();
+      
+      // Mock UserService methods
+      window.UserService = {
+        getUserByEmail: async (email) => {
+          if (email === 'dev@example.com') {
+            return {
+              id: 'test-user-id',
+              email: 'dev@example.com',
+              first_name: 'Dev',
+              last_name: 'User',
+              provider: 'dev',
+              apple_id_token: null,
+              created_at: new Date().toISOString(),
+              banhammer: false
+            };
+          }
+          return null;
+        },
+        getUserByAppleIdToken: async (token) => null, // eslint-disable-line @typescript-eslint/no-unused-vars
+        createUser: async (userData) => ({
+          id: 'new-user-id',
+          ...userData,
+          created_at: new Date().toISOString(),
+          banhammer: false
+        }),
+        updateUser: async (id, userData) => ({
+          id,
+          ...userData,
+          created_at: new Date().toISOString(),
+          banhammer: false
+        })
+      };
+      
+      // Mock the database module
+      window.mockDatabase = {
+        UserService: window.UserService
+      };
+      
+      // Set up authentication data and audio APIs
+      const authUser = {
+        id: 'test-user-id',
+        email: 'dev@example.com',
+        name: 'Dev User'
+      };
+      
+      const databaseUser = {
+        id: 'test-user-id',
+        email: 'dev@example.com',
+        first_name: 'Dev',
+        last_name: 'User',
+        provider: 'dev',
+        apple_id_token: null,
+        created_at: new Date().toISOString(),
+        banhammer: false
+      };
+      
+      localStorage.setItem('drawscale_user', JSON.stringify(authUser));
+      localStorage.setItem('drawscale_database_user', JSON.stringify(databaseUser));
       
       // Mock getUserMedia
       navigator.mediaDevices.getUserMedia = async () => {
@@ -64,7 +118,13 @@ test.describe('Audio Recording Flow', () => {
       window.MediaRecorder.isTypeSupported = () => true;
     });
     
+    // Wait a bit for the script to execute
+    await page.waitForTimeout(100);
+    
     await page.goto('/');
+    
+    // Wait for the app to load and show the authenticated state
+    await expect(page.locator('.app-header')).toBeVisible({ timeout: 10000 });
     await page.waitForSelector('.record-button', { timeout: 10000 });
   });
 
@@ -72,7 +132,7 @@ test.describe('Audio Recording Flow', () => {
     // First select a problem to enable recording
     const firstProblemCard = page.locator('.problem-card').first();
     await firstProblemCard.click();
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(500);
     
     const recordButton = page.locator('.record-button');
     
@@ -94,7 +154,7 @@ test.describe('Audio Recording Flow', () => {
     // First select a problem to enable recording
     const firstProblemCard = page.locator('.problem-card').first();
     await firstProblemCard.click();
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(500);
     
     // Listen for alert dialog
     let alertMessage = '';

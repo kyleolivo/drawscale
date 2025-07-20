@@ -58,7 +58,7 @@ describe('LoginPage Component', () => {
     fireEvent.click(devButton)
     
     expect(mockOnSignIn).toHaveBeenCalledWith({
-      authorization: { id_token: 'dev-token' },
+      authorization: { id_token: expect.stringMatching(/^dev-token-\d+$/) },
       user: {
         email: 'dev@example.com',
         name: { firstName: 'Dev', lastName: 'User' }

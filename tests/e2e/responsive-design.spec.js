@@ -1,13 +1,72 @@
 import { test, expect } from '@playwright/test';
 
 const mockAuthentication = async (page) => {
+  // Mock the database service and set up authentication before loading the app
   await page.addInitScript(() => {
-    window.localStorage.setItem('drawscale_user', JSON.stringify({
-      id: 'test-user',
-      email: 'test@example.com',
-      name: 'Test User'
-    }));
+    // Clear any existing localStorage first
+    localStorage.clear();
+    
+    // Mock UserService methods
+    window.UserService = {
+      getUserByEmail: async (email) => {
+        if (email === 'dev@example.com') {
+          return {
+            id: 'test-user-id',
+            email: 'dev@example.com',
+            first_name: 'Dev',
+            last_name: 'User',
+            provider: 'dev',
+            apple_id_token: null,
+            created_at: new Date().toISOString(),
+            banhammer: false
+          };
+        }
+        return null;
+      },
+              getUserByAppleIdToken: async (token) => null, // eslint-disable-line @typescript-eslint/no-unused-vars
+      createUser: async (userData) => ({
+        id: 'new-user-id',
+        ...userData,
+        created_at: new Date().toISOString(),
+        banhammer: false
+      }),
+      updateUser: async (id, userData) => ({
+        id,
+        ...userData,
+        created_at: new Date().toISOString(),
+        banhammer: false
+      })
+    };
+    
+    // Mock the database module
+    window.mockDatabase = {
+      UserService: window.UserService
+    };
+    
+    // Set up authentication data
+    const authUser = {
+      id: 'test-user-id',
+      email: 'dev@example.com',
+      name: 'Dev User'
+    };
+    
+    const databaseUser = {
+      id: 'test-user-id',
+      email: 'dev@example.com',
+      first_name: 'Dev',
+      last_name: 'User',
+      provider: 'dev',
+      apple_id_token: null,
+      created_at: new Date().toISOString(),
+      banhammer: false
+    };
+    
+    localStorage.setItem('drawscale_user', JSON.stringify(authUser));
+    localStorage.setItem('drawscale_database_user', JSON.stringify(databaseUser));
   });
+  
+  // Wait a bit for the script to execute
+  await page.waitForTimeout(100);
 };
 
 const viewports = [
@@ -30,9 +89,12 @@ test.describe('Responsive Design', () => {
       await mockAuthentication(page);
       await page.reload();
       
+      // Wait for the app to load and show the authenticated state
+      await expect(page.locator('.app-header')).toBeVisible({ timeout: 10000 });
+      
       // Check user avatar is visible
       await expect(page.locator('.user-avatar')).toBeVisible();
-      await expect(page.locator('.user-avatar')).toHaveText('TU');
+      await expect(page.locator('.user-avatar')).toHaveText('DU'); // Dev User initials
       await page.waitForSelector('.excalidraw-wrapper', { timeout: 10000 });
       await expect(page.locator('.excalidraw-wrapper')).toBeVisible();
       
@@ -59,12 +121,14 @@ test.describe('Responsive Design', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
     
+    // Wait for the app to load and show the authenticated state
+    await expect(page.locator('.app-header')).toBeVisible({ timeout: 10000 });
     await page.waitForSelector('.problem-drawer', { timeout: 10000 });
     
     // Select a problem to see presentation view
     const firstProblemCard = page.locator('.problem-card').first();
     await firstProblemCard.click();
-    await page.waitForTimeout(150);
+    await page.waitForTimeout(500);
     
     // Content should be visible
     await expect(page.locator('.problem-title')).toBeVisible();
