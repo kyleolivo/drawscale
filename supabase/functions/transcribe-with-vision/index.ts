@@ -27,8 +27,6 @@ serve(async (req) => {
     const formData = await req.formData()
     const audioFile = formData.get('audio') as File
     const imageFile = formData.get('image') as File
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const userEmail = formData.get('userEmail') as string
     const problemContextJson = formData.get('problemContext') as string
 
     if (!audioFile || !imageFile) {
