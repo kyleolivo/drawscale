@@ -148,7 +148,7 @@ function DrawCanvas(): JSX.Element {
         judgementCriteria: appState.currentProblem.judgementCriteria
       };
       
-      // Temporarily pass empty string for userEmail while whitelist is disabled
+      // Get user email from Supabase auth session
       const userEmail = user?.email || '';
       
       const result = await transcribeAudioWithImage(audioBlob, imageBlob, userEmail, problemContext);
