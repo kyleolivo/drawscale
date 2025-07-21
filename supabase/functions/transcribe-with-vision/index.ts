@@ -41,35 +41,6 @@ serve(async (req) => {
       )
     }
 
-    // Check if user email is authorized
-    // if (!userEmail) {
-    //   return new Response(
-    //     JSON.stringify({ error: 'User email is required' }),
-    //     { 
-    //       status: 400, 
-    //       headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-    //     }
-    //   )
-    // }
-
-    /* Commented out for temporary bypass
-    // Check if we're in development mode (skip authorization for dev)
-    const isProduction = Deno.env.get('ENVIRONMENT') === 'production' || Deno.env.get('NODE_ENV') === 'production';
-    
-    if (isProduction) {
-      const allowedEmails = Deno.env.get('ALLOWED_EMAILS')?.split(',').map(e => e.trim().toLowerCase()) || [];
-      if (!allowedEmails.includes(userEmail.toLowerCase())) {
-        return new Response(
-          JSON.stringify({ error: 'Access denied: Your email is not authorized to use this service.' }),
-          { 
-            status: 403, 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-          }
-        )
-      }
-    }
-    */
-
     // Parse problem context (required)
     if (!problemContextJson) {
       return new Response(
