@@ -16,7 +16,7 @@ export const STRIPE_CONFIG = {
       amount: 4.99,
       label: 'Medium tip',
       description: 'Buy me a coffee',
-      url: 'https://buy.stripe.com/YOUR_MEDIUM_DONATION_LINK', // Replace with your actual link
+      url: 'https://buy.stripe.com/5kQcN599S1rEampeoy5sA00', // Custom-amount Payment Link
     },
     large: {
       amount: 9.99,
