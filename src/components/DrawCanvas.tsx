@@ -12,6 +12,7 @@ import { transcribeAudioWithImage } from '../lib/supabase';
 import { ApplicationState, DrawCanvasAppState } from '../types/appState';
 import { SystemDesignProblem } from '../types/problem';
 import './DrawCanvas.css';
+import DonationButton from './DonationButton';
 
 function DrawCanvas(): JSX.Element {
   const { user, signOut } = useAuth();
@@ -790,6 +791,7 @@ function DrawCanvas(): JSX.Element {
         {isProcessingSubmission && (
           <ProcessingIndicator variant="compact" />
         )}
+        <DonationButton />
       </div>
     </div>
   );
