@@ -104,7 +104,6 @@ jobs:
         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
         vercel-args: '--prod'
-        scope: ${{ secrets.VERCEL_ORG_ID }}
     
     - name: Notify Discord - Deploy Completed
       uses: Ilshidur/action-discord@master
